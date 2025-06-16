@@ -375,6 +375,65 @@ app.get('/mood', (req, res) => {
   res.render('mood');
 });
 
+// Chemical analysis route
+app.get('/chemical', (req, res) => {
+    res.render('chemical');
+});
+
+// Chemical analysis API endpoint
+app.post('/analyze-chemical', async (req, res) => {
+    try {
+        const { chemicalName, percentage } = req.body;
+        
+        // This is a mock response - in a real application, you would:
+        // 1. Query a chemical database
+        // 2. Use an API for chemical safety information
+        // 3. Implement proper chemical analysis logic
+        const mockResponse = {
+            isSafe: Math.random() > 0.3, // 70% chance of being safe
+            safetyRating: Math.floor(Math.random() * 10) + 1,
+            commonUses: [
+                "Food additive",
+                "Preservative",
+                "Flavor enhancer"
+            ],
+            healthBenefits: [
+                "May help preserve food",
+                "Can enhance flavor",
+                "Generally recognized as safe by FDA"
+            ],
+            recommendation: "Based on our analysis, this chemical is generally safe for consumption in moderate amounts. However, as with any food additive, it's best to consume in moderation and be aware of any personal sensitivities."
+        };
+
+        // Add percentage-specific analysis if percentage is provided
+        if (percentage && !isNaN(percentage)) {
+            const percentageNum = parseFloat(percentage);
+            let percentageAnalysis = "";
+
+            if (percentageNum > 5) {
+                percentageAnalysis = `Warning: The concentration of ${percentageNum}% is relatively high. This may increase the risk of potential side effects. Consider products with lower concentrations.`;
+                mockResponse.safetyRating = Math.min(mockResponse.safetyRating, 6); // Reduce safety rating for high concentrations
+                mockResponse.isSafe = false;
+            } else if (percentageNum > 1) {
+                percentageAnalysis = `The concentration of ${percentageNum}% is within moderate range. While generally safe, monitor your consumption and be aware of any adverse reactions.`;
+                mockResponse.safetyRating = Math.min(mockResponse.safetyRating, 8);
+            } else {
+                percentageAnalysis = `The concentration of ${percentageNum}% is relatively low. This is generally considered a safe amount for consumption.`;
+            }
+
+            mockResponse.percentageAnalysis = percentageAnalysis;
+        }
+
+        // Simulate API delay
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        res.json(mockResponse);
+    } catch (error) {
+        console.error('Error analyzing chemical:', error);
+        res.status(500).json({ error: 'Failed to analyze chemical' });
+    }
+});
+
 // Global error handler
 app.use((err, req, res, next) => {
   console.error('Global Error:', err);

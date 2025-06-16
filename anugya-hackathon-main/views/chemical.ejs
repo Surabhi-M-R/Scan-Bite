@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chemical Safety Analysis - ANUGYA</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --gradient-primary: linear-gradient(135deg, #6B46C1, #805AD5);
+            --gradient-secondary: linear-gradient(135deg, #805AD5, #9F7AEA);
+            --color-dark: #1A202C;
+            --color-light: #F7FAFC;
+            --color-accent: #9F7AEA;
+        }
+
+        body {
+            background: var(--color-dark);
+            color: var(--color-light);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: var(--color-light);
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p {
+            color: #A0AEC0;
+            font-size: 1.1rem;
+        }
+
+        .chemical-form {
+            background: rgba(26, 32, 44, 0.8);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(159, 122, 234, 0.2);
+            border: 1px solid rgba(159, 122, 234, 0.2);
+            backdrop-filter: blur(10px);
+            margin-bottom: 2rem;
+            animation: fadeIn 1s ease-out;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--color-light);
+            font-weight: 500;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid rgba(159, 122, 234, 0.2);
+            border-radius: 0.8rem;
+            background: rgba(26, 32, 44, 0.5);
+            color: var(--color-light);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--color-accent);
+            box-shadow: 0 0 0 3px rgba(159, 122, 234, 0.2);
+        }
+
+        .submit-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            border-radius: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(159, 122, 234, 0.3);
+            width: 100%;
+            justify-content: center;
+        }
+
+        .submit-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(159, 122, 234, 0.4);
+        }
+
+        .submit-button i {
+            font-size: 1.2rem;
+        }
+
+        .result-section {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .result-section.active {
+            display: block;
+        }
+
+        .result-card {
+            background: rgba(26, 32, 44, 0.8);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 20px rgba(159, 122, 234, 0.2);
+            border: 1px solid rgba(159, 122, 234, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .safety-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.8rem 1.5rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .safety-badge.safe {
+            background: linear-gradient(135deg, #48BB78, #38A169);
+            color: white;
+            box-shadow: 0 0 20px rgba(72, 187, 120, 0.3);
+        }
+
+        .safety-badge.unsafe {
+            background: linear-gradient(135deg, #F56565, #C53030);
+            color: white;
+            box-shadow: 0 0 20px rgba(245, 101, 101, 0.3);
+        }
+
+        .rating-bar {
+            width: 100%;
+            height: 12px;
+            background: rgba(159, 122, 234, 0.2);
+            border-radius: 6px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .rating-fill {
+            height: 100%;
+            background: var(--gradient-primary);
+            border-radius: 6px;
+            transition: width 1s ease-out;
+        }
+
+        .rating-labels {
+            display: flex;
+            justify-content: space-between;
+            color: #A0AEC0;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .info-section {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(159, 122, 234, 0.2);
+        }
+
+        .info-section h3 {
+            color: var(--color-accent);
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .info-section p, .info-section ul {
+            color: #A0AEC0;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .info-section ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .info-section li {
+            margin-bottom: 0.5rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .info-section li:before {
+            content: "•";
+            color: var(--color-accent);
+            position: absolute;
+            left: 0;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            display: none;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(159, 122, 234, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--color-accent);
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+
+        .input-hint {
+            display: block;
+            color: #A0AEC0;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+
+        .percentage-info {
+            background: rgba(159, 122, 234, 0.1);
+            border-radius: 0.8rem;
+            padding: 1rem;
+            margin-top: 1rem;
+            border: 1px solid rgba(159, 122, 234, 0.2);
+        }
+
+        .percentage-info h4 {
+            color: var(--color-accent);
+            margin: 0 0 0.5rem 0;
+            font-size: 1rem;
+        }
+
+        .percentage-info p {
+            color: #A0AEC0;
+            margin: 0;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Chemical Safety Analysis</h1>
+            <p>Enter a chemical name to get detailed safety information and recommendations</p>
+        </div>
+
+        <div class="chemical-form">
+            <form id="chemicalForm">
+                <div class="input-group">
+                    <label for="chemicalName">Chemical Name</label>
+                    <input type="text" id="chemicalName" name="chemicalName" placeholder="Enter chemical name (e.g., Aspartame, MSG)" required>
+                </div>
+                <div class="input-group">
+                    <label for="percentage">Percentage (Optional)</label>
+                    <input type="number" id="percentage" name="percentage" placeholder="Enter percentage (e.g., 0.5)" min="0" max="100" step="0.01">
+                    <small class="input-hint">Enter the percentage of the chemical in the product (optional)</small>
+                </div>
+                <button type="submit" class="submit-button">
+                    <i class="fas fa-flask"></i>
+                    Analyze Chemical
+                </button>
+            </form>
+        </div>
+
+        <div class="loading">
+            <div class="spinner"></div>
+            <p>Analyzing chemical safety...</p>
+        </div>
+
+        <div class="result-section">
+            <div class="result-card">
+                <div class="safety-badge">
+                    <i class="fas fa-shield-alt"></i>
+                    <span class="safety-status">Safe to Consume</span>
+                </div>
+                
+                <div class="rating-section">
+                    <h3>Safety Rating</h3>
+                    <div class="rating-bar">
+                        <div class="rating-fill" style="width: 80%"></div>
+                    </div>
+                    <div class="rating-labels">
+                        <span>Low Safety</span>
+                        <span>High Safety</span>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <h3>Common Uses</h3>
+                    <ul class="common-uses"></ul>
+                </div>
+
+                <div class="info-section">
+                    <h3>Health Benefits</h3>
+                    <ul class="health-benefits"></ul>
+                </div>
+
+                <div class="info-section">
+                    <h3>Final Recommendation</h3>
+                    <p class="recommendation"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('chemicalForm');
+            const loading = document.querySelector('.loading');
+            const resultSection = document.querySelector('.result-section');
+            const safetyBadge = document.querySelector('.safety-badge');
+            const safetyStatus = document.querySelector('.safety-status');
+            const ratingFill = document.querySelector('.rating-fill');
+            const commonUses = document.querySelector('.common-uses');
+            const healthBenefits = document.querySelector('.health-benefits');
+            const recommendation = document.querySelector('.recommendation');
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const chemicalName = document.getElementById('chemicalName').value;
+                const percentage = document.getElementById('percentage').value;
+                
+                // Show loading
+                loading.classList.add('active');
+                resultSection.classList.remove('active');
+                
+                try {
+                    const response = await fetch('/analyze-chemical', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ chemicalName, percentage })
+                    });
+                    
+                    if (!response.ok) throw new Error('Failed to analyze chemical');
+                    
+                    const data = await response.json();
+                    
+                    // Update UI with results
+                    safetyBadge.className = `safety-badge ${data.isSafe ? 'safe' : 'unsafe'}`;
+                    safetyStatus.textContent = data.isSafe ? 'Safe to Consume' : 'Not Safe to Consume';
+                    ratingFill.style.width = `${(data.safetyRating / 10) * 100}%`;
+                    
+                    // Update lists
+                    commonUses.innerHTML = data.commonUses.map(use => `<li>${use}</li>`).join('');
+                    healthBenefits.innerHTML = data.healthBenefits.map(benefit => `<li>${benefit}</li>`).join('');
+                    
+                    // Add percentage-specific recommendation if available
+                    let recommendationText = data.recommendation;
+                    if (data.percentageAnalysis) {
+                        recommendationText += `<div class="percentage-info">
+                            <h4>Percentage Analysis</h4>
+                            <p>${data.percentageAnalysis}</p>
+                        </div>`;
+                    }
+                    recommendation.innerHTML = recommendationText;
+                    
+                    // Show results
+                    resultSection.classList.add('active');
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Failed to analyze chemical. Please try again.');
+                } finally {
+                    loading.classList.remove('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html> 
