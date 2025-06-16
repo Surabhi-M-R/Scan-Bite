@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mood-Based Food Recommendations - ANUGYA</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --gradient-primary: linear-gradient(135deg, #6B46C1, #805AD5);
+            --gradient-secondary: linear-gradient(135deg, #805AD5, #9F7AEA);
+            --color-dark: #1A202C;
+            --color-light: #F7FAFC;
+            --color-accent: #9F7AEA;
+        }
+
+        body {
+            background: var(--color-dark);
+            color: var(--color-light);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: var(--color-light);
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .header p {
+            color: #A0AEC0;
+            font-size: 1.1rem;
+        }
+
+        .mood-selector {
+            background: rgba(26, 32, 44, 0.8);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(159, 122, 234, 0.2);
+            border: 1px solid rgba(159, 122, 234, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .mood-category {
+            margin-bottom: 1.5rem;
+        }
+
+        .mood-category h3 {
+            color: var(--color-accent);
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .mood-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+        }
+
+        .mood-button {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 2rem;
+            background: rgba(159, 122, 234, 0.1);
+            color: var(--color-light);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            border: 1px solid rgba(159, 122, 234, 0.2);
+        }
+
+        .mood-button:hover {
+            background: var(--gradient-primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(159, 122, 234, 0.3);
+        }
+
+        .mood-button.active {
+            background: var(--gradient-primary);
+            box-shadow: 0 0 20px rgba(159, 122, 234, 0.4);
+        }
+
+        .recommendations {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .recommendations.active {
+            display: block;
+        }
+
+        .food-card {
+            background: rgba(26, 32, 44, 0.8);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 20px rgba(159, 122, 234, 0.2);
+            border: 1px solid rgba(159, 122, 234, 0.2);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .food-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(159, 122, 234, 0.3);
+        }
+
+        .food-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(159, 122, 234, 0.2);
+        }
+
+        .food-header i {
+            font-size: 1.5rem;
+            margin-right: 1rem;
+            color: var(--color-accent);
+        }
+
+        .food-header h3 {
+            font-size: 1.25rem;
+            color: var(--color-light);
+            margin: 0;
+        }
+
+        .food-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .detail-item {
+            background: rgba(159, 122, 234, 0.1);
+            padding: 1rem;
+            border-radius: 0.8rem;
+            border: 1px solid rgba(159, 122, 234, 0.2);
+        }
+
+        .detail-item h4 {
+            color: var(--color-accent);
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .detail-item p, .detail-item ul {
+            color: #A0AEC0;
+            margin: 0;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .detail-item ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .detail-item li {
+            margin-bottom: 0.5rem;
+            padding-left: 1.2rem;
+            position: relative;
+        }
+
+        .detail-item li:before {
+            content: "•";
+            color: var(--color-accent);
+            position: absolute;
+            left: 0;
+        }
+
+        .additional-tips {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 2px solid rgba(159, 122, 234, 0.2);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            display: none;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(159, 122, 234, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--color-accent);
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .mood-buttons {
+                justify-content: center;
+            }
+
+            .food-details {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Mood-Based Food Recommendations</h1>
+            <p>Select your current mood to get personalized food recommendations</p>
+        </div>
+
+        <div class="mood-selector">
+            <div class="mood-category">
+                <h3>Positive Moods</h3>
+                <div class="mood-buttons">
+                    <button class="mood-button" data-mood="happy">Happy</button>
+                    <button class="mood-button" data-mood="joyful">Joyful</button>
+                    <button class="mood-button" data-mood="excited">Excited</button>
+                    <button class="mood-button" data-mood="energetic">Energetic</button>
+                    <button class="mood-button" data-mood="motivated">Motivated</button>
+                    <button class="mood-button" data-mood="peaceful">Peaceful</button>
+                    <button class="mood-button" data-mood="grateful">Grateful</button>
+                    <button class="mood-button" data-mood="optimistic">Optimistic</button>
+                    <button class="mood-button" data-mood="confident">Confident</button>
+                    <button class="mood-button" data-mood="inspired">Inspired</button>
+                    <button class="mood-button" data-mood="relaxed">Relaxed</button>
+                    <button class="mood-button" data-mood="content">Content</button>
+                </div>
+            </div>
+
+            <div class="mood-category">
+                <h3>Negative Moods</h3>
+                <div class="mood-buttons">
+                    <button class="mood-button" data-mood="sad">Sad</button>
+                    <button class="mood-button" data-mood="anxious">Anxious</button>
+                    <button class="mood-button" data-mood="stressed">Stressed</button>
+                    <button class="mood-button" data-mood="tired">Tired</button>
+                    <button class="mood-button" data-mood="depressed">Depressed</button>
+                    <button class="mood-button" data-mood="angry">Angry</button>
+                    <button class="mood-button" data-mood="frustrated">Frustrated</button>
+                    <button class="mood-button" data-mood="overwhelmed">Overwhelmed</button>
+                    <button class="mood-button" data-mood="lonely">Lonely</button>
+                    <button class="mood-button" data-mood="worried">Worried</button>
+                    <button class="mood-button" data-mood="irritable">Irritable</button>
+                    <button class="mood-button" data-mood="exhausted">Exhausted</button>
+                </div>
+            </div>
+
+            <div class="mood-category">
+                <h3>Neutral Moods</h3>
+                <div class="mood-buttons">
+                    <button class="mood-button" data-mood="focused">Focused</button>
+                    <button class="mood-button" data-mood="calm">Calm</button>
+                    <button class="mood-button" data-mood="balanced">Balanced</button>
+                    <button class="mood-button" data-mood="mindful">Mindful</button>
+                    <button class="mood-button" data-mood="centered">Centered</button>
+                    <button class="mood-button" data-mood="reflective">Reflective</button>
+                    <button class="mood-button" data-mood="contemplative">Contemplative</button>
+                    <button class="mood-button" data-mood="curious">Curious</button>
+                    <button class="mood-button" data-mood="thoughtful">Thoughtful</button>
+                    <button class="mood-button" data-mood="present">Present</button>
+                    <button class="mood-button" data-mood="aware">Aware</button>
+                    <button class="mood-button" data-mood="grounded">Grounded</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="loading">
+            <div class="spinner"></div>
+            <p>Getting personalized recommendations...</p>
+        </div>
+
+        <div class="recommendations"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const moodButtons = document.querySelectorAll('.mood-button');
+            const recommendations = document.querySelector('.recommendations');
+            const loading = document.querySelector('.loading');
+            let lastMood = null;
+
+            moodButtons.forEach(button => {
+                button.addEventListener('click', async () => {
+                    const mood = button.dataset.mood;
+                    
+                    // Don't fetch if the same mood is selected
+                    if (mood === lastMood) return;
+                    
+                    // Update active state
+                    moodButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    
+                    // Show loading
+                    loading.classList.add('active');
+                    recommendations.classList.remove('active');
+                    
+                    try {
+                        const response = await fetch('/get-mood-food-recommendations', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ mood })
+                        });
+                        
+                        if (!response.ok) throw new Error('Failed to get recommendations');
+                        
+                        const data = await response.json();
+                        displayRecommendations(data);
+                        lastMood = mood;
+                    } catch (error) {
+                        console.error('Error:', error);
+                        recommendations.innerHTML = `
+                            <div class="food-card">
+                                <div class="food-header">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    <h3>Error</h3>
+                                </div>
+                                <p>Failed to get recommendations. Please try again.</p>
+                            </div>
+                        `;
+                    } finally {
+                        loading.classList.remove('active');
+                        recommendations.classList.add('active');
+                    }
+                });
+            });
+
+            function displayRecommendations(data) {
+                let html = '';
+                
+                // Display foods
+                data.foods.forEach(food => {
+                    html += `
+                        <div class="food-card">
+                            <div class="food-header">
+                                <i class="fas fa-utensils"></i>
+                                <h3>${food.name}</h3>
+                            </div>
+                            <div class="food-details">
+                                <div class="detail-item">
+                                    <h4><i class="fas fa-heart"></i> Benefits</h4>
+                                    <p>${food.benefits}</p>
+                                </div>
+                                <div class="detail-item">
+                                    <h4><i class="fas fa-vitamin"></i> Key Nutrients</h4>
+                                    <ul>
+                                        ${food.nutrients.map(nutrient => `<li>${nutrient}</li>`).join('')}
+                                    </ul>
+                                </div>
+                                <div class="detail-item">
+                                    <h4><i class="fas fa-clock"></i> Best Time</h4>
+                                    <p>${food.bestTime}</p>
+                                </div>
+                                <div class="detail-item">
+                                    <h4><i class="fas fa-utensils"></i> Preparation</h4>
+                                    <p>${food.preparation}</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                // Display additional tips
+                if (data.additionalTips) {
+                    html += `
+                        <div class="food-card additional-tips">
+                            <div class="food-header">
+                                <i class="fas fa-lightbulb"></i>
+                                <h3>Additional Tips</h3>
+                            </div>
+                            <div class="food-details">
+                                <div class="detail-item">
+                                    <h4><i class="fas fa-info-circle"></i> Dietary Advice</h4>
+                                    <p>${data.additionalTips.dietaryAdvice}</p>
+                                </div>
+                                <div class="detail-item">
+                                    <h4><i class="fas fa-list"></i> Lifestyle Tips</h4>
+                                    <ul>
+                                        ${data.additionalTips.lifestyleTips.map(tip => `<li>${tip}</li>`).join('')}
+                                    </ul>
+                                </div>
+                                <div class="detail-item">
+                                    <h4><i class="fas fa-ban"></i> Foods to Avoid</h4>
+                                    <ul>
+                                        ${data.additionalTips.avoidFoods.map(food => `<li>${food}</li>`).join('')}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                recommendations.innerHTML = html;
+            }
+        });
+    </script>
+</body>
+</html> 

@@ -370,6 +370,11 @@ app.get('/final', (req, res) => {
   }
 });
 
+// Add this route before the error handler
+app.get('/mood', (req, res) => {
+  res.render('mood');
+});
+
 // Global error handler
 app.use((err, req, res, next) => {
   console.error('Global Error:', err);
@@ -394,24 +399,69 @@ app.post('/get-mood-food-recommendations', async (req, res) => {
     if (!mood) {
       return res.status(400).json({ error: 'Mood is required' });
     }
-   
-    // Construct the prompt for Gemini API
-    const prompt = `Provide 10-15 healthy food recommendations that help with ${mood} mood.
-    For each food, include a brief explanation of how it helps with this specific mood.
-    Format the response as a JSON object with a "foods" array where each item has "name" and "benefits" properties.
-    Also include an "additionalTips" property with general dietary advice for this mood.
-   
-    Example format:
+
+    // Define mood categories and their variations
+    const moodCategories = {
+      positive: [
+        'happy', 'joyful', 'excited', 'energetic', 'motivated', 'peaceful', 
+        'grateful', 'optimistic', 'confident', 'inspired', 'relaxed', 'content'
+      ],
+      negative: [
+        'sad', 'anxious', 'stressed', 'tired', 'depressed', 'angry', 
+        'frustrated', 'overwhelmed', 'lonely', 'worried', 'irritable', 'exhausted'
+      ],
+      neutral: [
+        'focused', 'calm', 'balanced', 'mindful', 'centered', 'reflective',
+        'contemplative', 'curious', 'thoughtful', 'present', 'aware', 'grounded'
+      ]
+    };
+
+    // Determine mood category
+    let moodCategory = 'neutral';
+    for (const [category, moods] of Object.entries(moodCategories)) {
+      if (moods.includes(mood.toLowerCase())) {
+        moodCategory = category;
+        break;
+      }
+    }
+
+    // Construct the prompt for Gemini API with mood-specific context
+    const prompt = `Provide 10-15 healthy food recommendations that help with ${mood} mood. 
+    Consider the following aspects:
+    - Foods that naturally boost mood and energy
+    - Foods rich in mood-regulating nutrients
+    - Foods that help with stress reduction
+    - Foods that promote better sleep (if relevant)
+    - Foods that support mental clarity
+    - Foods that help with emotional balance
+
+    For each food, include:
+    - A brief explanation of how it helps with this specific mood
+    - Key nutrients that contribute to mood improvement
+    - Simple preparation suggestions
+    - Best time to consume
+
+    Format the response as a JSON object with:
     {
+      "moodCategory": "${moodCategory}",
       "foods": [
         {
-          "name": "Dark Chocolate",
-          "benefits": "Contains flavonoids that may improve mood by increasing serotonin levels"
+          "name": "string",
+          "benefits": "string",
+          "nutrients": ["list of key nutrients"],
+          "preparation": "string",
+          "bestTime": "string"
         }
       ],
-      "additionalTips": "Stay hydrated and maintain regular meal times"
-    }`;
-   
+      "additionalTips": {
+        "dietaryAdvice": "string",
+        "lifestyleTips": ["list of tips"],
+        "avoidFoods": ["list of foods to avoid"]
+      }
+    }
+
+    Make the recommendations specific to ${mood} mood and ensure they are practical and easy to implement.`;
+
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
