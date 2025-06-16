@@ -3,177 +3,437 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ANUGYA - Analysis Results</title>
+    <title>Analysis Results - ANUGYA</title>
     <link rel="stylesheet" href="/styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        .analysis-container {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
-            margin: 20px 0;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+        :root {
+            --gradient-primary: linear-gradient(135deg, #6B46C1, #805AD5);
+            --gradient-secondary: linear-gradient(135deg, #805AD5, #9F7AEA);
+            --color-dark: #1A202C;
+            --color-light: #F7FAFC;
+            --color-accent: #9F7AEA;
         }
-        .analysis-section {
-            margin-bottom: 25px;
-        }
-        .analysis-title {
-            font-size: 1.2em;
-            color: #fff;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .analysis-content {
-            color: #e0e0e0;
-            line-height: 1.6;
-        }
-        .ingredient-list {
-            list-style: none;
+
+        body {
+            background: var(--color-dark);
+            color: var(--color-light);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            margin: 0;
             padding: 0;
         }
-        .ingredient-item {
+
+        .result-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .header-section {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeInDown 0.8s ease-out;
+            background: rgba(107, 70, 193, 0.1);
+            padding: 2rem;
+            border-radius: 1rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(159, 122, 234, 0.2);
+        }
+
+        .header-section h1 {
+            font-size: 2.5rem;
+            color: var(--color-light);
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .header-section p {
+            color: #A0AEC0;
+            font-size: 1.1rem;
+        }
+
+        .product-image {
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+            border-radius: 1rem;
+            box-shadow: 0 4px 20px rgba(159, 122, 234, 0.3);
+            margin: 0 auto 2rem;
+            display: block;
+            animation: fadeIn 1s ease-out;
+            border: 2px solid rgba(159, 122, 234, 0.3);
+        }
+
+        .analysis-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .analysis-card {
+            background: rgba(26, 32, 44, 0.8);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(159, 122, 234, 0.2);
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.8s ease-out;
+            border: 1px solid rgba(159, 122, 234, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .analysis-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(159, 122, 234, 0.3);
+            border-color: rgba(159, 122, 234, 0.4);
+        }
+
+        .card-header {
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(159, 122, 234, 0.2);
         }
-        .rating-badge {
+
+        .card-header i {
+            font-size: 1.5rem;
+            margin-right: 1rem;
+            color: var(--color-accent);
+            text-shadow: 0 0 10px rgba(159, 122, 234, 0.5);
+        }
+
+        .card-header h3 {
+            font-size: 1.25rem;
+            color: var(--color-light);
+            margin: 0;
+        }
+
+        .safety-badge {
+            display: inline-block;
+            padding: 0.5rem 1.5rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            animation: pulse 2s infinite;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .safety-badge.safe {
+            background: linear-gradient(135deg, #48BB78, #38A169);
+            color: white;
+            box-shadow: 0 0 20px rgba(72, 187, 120, 0.3);
+        }
+
+        .safety-badge.unsafe {
+            background: linear-gradient(135deg, #F56565, #C53030);
+            color: white;
+            box-shadow: 0 0 20px rgba(245, 101, 101, 0.3);
+        }
+
+        .rating-circle {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 0 auto 1.5rem;
             background: var(--gradient-primary);
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-weight: 600;
             color: white;
+            animation: scaleIn 0.5s ease-out;
+            box-shadow: 0 0 30px rgba(159, 122, 234, 0.4);
+            border: 3px solid rgba(255, 255, 255, 0.1);
         }
-        .warning-badge {
-            background: #ff4444;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-weight: 600;
-            color: white;
+
+        .info-item {
+            margin-bottom: 1.5rem;
+            padding: 1.2rem;
+            background: rgba(159, 122, 234, 0.1);
+            border-radius: 0.8rem;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(159, 122, 234, 0.2);
         }
-        .benefit-badge {
-            background: #00C851;
-            padding: 5px 15px;
-            border-radius: 20px;
+
+        .info-item:hover {
+            background: rgba(159, 122, 234, 0.15);
+            transform: translateX(5px);
+        }
+
+        .info-item h4 {
+            color: var(--color-accent);
+            margin-bottom: 0.8rem;
+            font-size: 1.1rem;
+            text-shadow: 0 0 10px rgba(159, 122, 234, 0.3);
+        }
+
+        .info-item p, .info-item li {
+            color: #A0AEC0;
+            line-height: 1.6;
+        }
+
+        .info-item ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .info-item li {
+            margin-bottom: 0.8rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .info-item li:before {
+            content: "•";
+            color: var(--color-accent);
+            position: absolute;
+            left: 0;
+            text-shadow: 0 0 10px rgba(159, 122, 234, 0.5);
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 3rem;
+        }
+
+        .action-button {
+            padding: 1rem 2rem;
+            border-radius: 0.8rem;
             font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .action-button.primary {
+            background: var(--gradient-primary);
             color: white;
+            box-shadow: 0 4px 15px rgba(159, 122, 234, 0.3);
+        }
+
+        .action-button.secondary {
+            background: rgba(159, 122, 234, 0.1);
+            color: var(--color-light);
+            border: 1px solid rgba(159, 122, 234, 0.3);
+        }
+
+        .action-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(159, 122, 234, 0.4);
+        }
+
+        .action-button i {
+            font-size: 1.2rem;
+        }
+
+        @keyframes fadeIn {
+            from { 
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to { 
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0% { 
+                transform: scale(1);
+                box-shadow: 0 0 20px rgba(159, 122, 234, 0.3);
+            }
+            50% { 
+                transform: scale(1.05);
+                box-shadow: 0 0 30px rgba(159, 122, 234, 0.5);
+            }
+            100% { 
+                transform: scale(1);
+                box-shadow: 0 0 20px rgba(159, 122, 234, 0.3);
+            }
+        }
+
+        @keyframes scaleIn {
+            from { 
+                transform: scale(0);
+                opacity: 0;
+            }
+            to { 
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .analysis-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header-section h1 {
+                font-size: 2rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .action-button {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .rating-circle {
+                width: 80px;
+                height: 80px;
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Add glowing effect to important elements */
+        .safety-badge, .rating-circle, .card-header i {
+            animation: glow 2s infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                box-shadow: 0 0 10px rgba(159, 122, 234, 0.3);
+            }
+            to {
+                box-shadow: 0 0 20px rgba(159, 122, 234, 0.6);
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Analysis Results</h1>
+    <div class="result-container">
+        <div class="header-section">
+            <h1>Analysis Results</h1>
+            <p>Detailed analysis of your food product</p>
+        </div>
 
-        <div class="analysis-container">
-            <div class="analysis-section">
-                <h2 class="analysis-title">
-                    <i class="fas fa-box"></i>
-                    Product Information
-                </h2>
-                <div class="analysis-content">
-                    <h3><%= analysis.productName %></h3>
+        <img src="<%= imagePath %>" alt="Product Image" class="product-image">
+
+        <div class="analysis-grid">
+            <!-- Safety Assessment Card -->
+            <div class="analysis-card">
+                <div class="card-header">
+                    <i class="fas fa-shield-alt"></i>
+                    <h3>Safety Assessment</h3>
                 </div>
+                <div class="safety-badge <%= analysis.safetyAssessment.isSafe ? 'safe' : 'unsafe' %>">
+                    <%= analysis.safetyAssessment.isSafe ? 'Safe to Consume' : 'Not Safe to Consume' %>
+                </div>
+                <div class="rating-circle">
+                    <%= analysis.safetyRating.score %>
+                </div>
+                <div class="info-item">
+                    <h4>Safety Rating Explanation</h4>
+                    <p><%= analysis.safetyRating.explanation %></p>
+                </div>
+                <% if (analysis.safetyAssessment.warnings && analysis.safetyAssessment.warnings.length > 0) { %>
+                    <div class="info-item">
+                        <h4>Warnings</h4>
+                        <ul>
+                            <% analysis.safetyAssessment.warnings.forEach(warning => { %>
+                                <li><%= warning %></li>
+                            <% }); %>
+                        </ul>
+                    </div>
+                <% } %>
             </div>
 
-            <div class="analysis-section">
-                <h2 class="analysis-title">
+            <!-- Key Ingredients Card -->
+            <div class="analysis-card">
+                <div class="card-header">
                     <i class="fas fa-list"></i>
-                    Key Ingredients
-                </h2>
-                <div class="analysis-content">
-                    <ul class="ingredient-list">
+                    <h3>Key Ingredients</h3>
+                </div>
+                <div class="info-item">
+                    <h4>Main Ingredients</h4>
+                    <ul>
                         <% analysis.keyIngredients.forEach(ingredient => { %>
-                            <li class="ingredient-item">
-                                <i class="fas fa-circle"></i>
-                                <%= ingredient %>
-                            </li>
+                            <li><%= ingredient %></li>
                         <% }); %>
                     </ul>
                 </div>
-            </div>
-
-            <div class="analysis-section">
-                <h2 class="analysis-title">
-                    <i class="fas fa-shield-alt"></i>
-                    Safety Assessment
-                </h2>
-                <div class="analysis-content">
-                    <p><%= analysis.safetyAssessment %></p>
-                    <div class="rating-badge">
-                        Safety Rating: <%= analysis.safetyRating.score %>/10
-                    </div>
-                    <p><%= analysis.safetyRating.explanation %></p>
-                </div>
-            </div>
-
-            <% if (analysis.harmfulChemicals && analysis.harmfulChemicals.length > 0) { %>
-                <div class="analysis-section">
-                    <h2 class="analysis-title">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        Harmful Chemicals
-                    </h2>
-                    <div class="analysis-content">
-                        <ul class="ingredient-list">
+                <% if (analysis.harmfulChemicals && analysis.harmfulChemicals.length > 0) { %>
+                    <div class="info-item">
+                        <h4>Harmful Chemicals</h4>
+                        <ul>
                             <% analysis.harmfulChemicals.forEach(chemical => { %>
-                                <li class="ingredient-item">
-                                    <i class="fas fa-exclamation-circle"></i>
-                                    <%= chemical %>
-                                </li>
+                                <li><%= chemical %></li>
                             <% }); %>
                         </ul>
                     </div>
-                </div>
-            <% } %>
+                <% } %>
+            </div>
 
-            <% if (analysis.healthBenefits && analysis.healthBenefits.length > 0) { %>
-                <div class="analysis-section">
-                    <h2 class="analysis-title">
-                        <i class="fas fa-heart"></i>
-                        Health Benefits
-                    </h2>
-                    <div class="analysis-content">
-                        <ul class="ingredient-list">
+            <!-- Health Benefits Card -->
+            <div class="analysis-card">
+                <div class="card-header">
+                    <i class="fas fa-heart"></i>
+                    <h3>Health Information</h3>
+                </div>
+                <% if (analysis.healthBenefits && analysis.healthBenefits.length > 0) { %>
+                    <div class="info-item">
+                        <h4>Health Benefits</h4>
+                        <ul>
                             <% analysis.healthBenefits.forEach(benefit => { %>
-                                <li class="ingredient-item">
-                                    <i class="fas fa-check-circle"></i>
-                                    <%= benefit %>
-                                </li>
+                                <li><%= benefit %></li>
                             <% }); %>
                         </ul>
                     </div>
-                </div>
-            <% } %>
-
-            <div class="analysis-section">
-                <h2 class="analysis-title">
-                    <i class="fas fa-info-circle"></i>
-                    Consumption Recommendations
-                </h2>
-                <div class="analysis-content">
+                <% } %>
+                <div class="info-item">
+                    <h4>Consumption Recommendations</h4>
                     <p><%= analysis.consumptionRecommendations %></p>
                 </div>
             </div>
 
+            <!-- Alternative Products Card -->
             <% if (analysis.alternativeProducts && analysis.alternativeProducts.length > 0) { %>
-                <div class="analysis-section">
-                    <h2 class="analysis-title">
+                <div class="analysis-card">
+                    <div class="card-header">
                         <i class="fas fa-exchange-alt"></i>
-                        Alternative Products
-                    </h2>
-                    <div class="analysis-content">
-                        <ul class="ingredient-list">
+                        <h3>Alternative Products</h3>
+                    </div>
+                    <div class="info-item">
+                        <ul>
                             <% analysis.alternativeProducts.forEach(alternative => { %>
-                                <li class="ingredient-item">
-                                    <i class="fas fa-arrow-right"></i>
-                                    <%= alternative %>
-                                </li>
+                                <li><%= alternative %></li>
                             <% }); %>
                         </ul>
                     </div>
@@ -181,194 +441,44 @@
             <% } %>
         </div>
 
-        <div class="detailed-analysis">
-            <h2 class="analysis-title">
-                <i class="fas fa-chart-bar"></i>
-                Detailed Analysis
-            </h2>
-
-            <div class="analysis-grid">
-                <div class="analysis-card">
-                    <h3 class="card-title">
-                        <i class="fas fa-utensils"></i>
-                        Nutritional Information
-                    </h3>
-                    <div class="card-content">
-                        <div class="nutritional-info">
-                            <% if (detailedAnalysis.nutritionalInfo) { %>
-                                <div class="nutrition-item">
-                                    <i class="fas fa-fire"></i>
-                                    <div>
-                                        <h4>Calories</h4>
-                                        <p><%= detailedAnalysis.nutritionalInfo.calories %></p>
-                                    </div>
-                                </div>
-                                <div class="nutrition-item">
-                                    <i class="fas fa-drumstick-bite"></i>
-                                    <div>
-                                        <h4>Macronutrients</h4>
-                                        <ul>
-                                            <li>Protein: <%= detailedAnalysis.nutritionalInfo.macronutrients.protein %></li>
-                                            <li>Carbs: <%= detailedAnalysis.nutritionalInfo.macronutrients.carbs %></li>
-                                            <li>Fats: <%= detailedAnalysis.nutritionalInfo.macronutrients.fats %></li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <% if (detailedAnalysis.nutritionalInfo.vitamins && detailedAnalysis.nutritionalInfo.vitamins.length > 0) { %>
-                                    <div class="nutrition-item">
-                                        <i class="fas fa-pills"></i>
-                                        <div>
-                                            <h4>Vitamins</h4>
-                                            <ul>
-                                                <% detailedAnalysis.nutritionalInfo.vitamins.forEach(vitamin => { %>
-                                                    <li><%= vitamin %></li>
-                                                <% }); %>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                <% } %>
-                                <% if (detailedAnalysis.nutritionalInfo.minerals && detailedAnalysis.nutritionalInfo.minerals.length > 0) { %>
-                                    <div class="nutrition-item">
-                                        <i class="fas fa-gem"></i>
-                                        <div>
-                                            <h4>Minerals</h4>
-                                            <ul>
-                                                <% detailedAnalysis.nutritionalInfo.minerals.forEach(mineral => { %>
-                                                    <li><%= mineral %></li>
-                                                <% }); %>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                <% } %>
-                            <% } else { %>
-                                <p class="no-info">Nutritional information not available</p>
-                            <% } %>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="analysis-card">
-                    <h3 class="card-title">
-                        <i class="fas fa-heartbeat"></i>
-                        Health Impact
-                    </h3>
-                    <div class="card-content">
-                        <div class="health-impact">
-                            <% if (detailedAnalysis.healthImpact) { %>
-                                <div class="impact-item">
-                                    <i class="fas fa-clock"></i>
-                                    <div>
-                                        <h4>Short Term Effects</h4>
-                                        <p><%= detailedAnalysis.healthImpact.shortTerm %></p>
-                                    </div>
-                                </div>
-                                <div class="impact-item">
-                                    <i class="fas fa-calendar-alt"></i>
-                                    <div>
-                                        <h4>Long Term Effects</h4>
-                                        <p><%= detailedAnalysis.healthImpact.longTerm %></p>
-                                    </div>
-                                </div>
-                                <% if (detailedAnalysis.healthImpact.risks && detailedAnalysis.healthImpact.risks.length > 0) { %>
-                                    <div class="impact-item">
-                                        <i class="fas fa-exclamation-triangle"></i>
-                                        <div>
-                                            <h4>Potential Risks</h4>
-                                            <ul>
-                                                <% detailedAnalysis.healthImpact.risks.forEach(risk => { %>
-                                                    <li><%= risk %></li>
-                                                <% }); %>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                <% } %>
-                            <% } else { %>
-                                <p class="no-info">Health impact information not available</p>
-                            <% } %>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="analysis-card">
-                    <h3 class="card-title">
-                        <i class="fas fa-clipboard-list"></i>
-                        Dietary Considerations
-                    </h3>
-                    <div class="card-content">
-                        <% Object.entries(detailedAnalysis.dietaryConsiderations).forEach(([key, value]) => { %>
-                            <div class="diet-tag"><%= key %></div>
-                            <p><%= value %></p>
-                        <% }); %>
-                    </div>
-                </div>
-
-                <div class="analysis-card">
-                    <h3 class="card-title">
-                        <i class="fas fa-box-open"></i>
-                        Storage and Handling
-                    </h3>
-                    <div class="card-content">
-                        <div class="storage-info">
-                            <% if (detailedAnalysis.storage) { %>
-                                <div class="storage-item">
-                                    <i class="fas fa-info-circle"></i>
-                                    <div>
-                                        <h4>Storage Conditions</h4>
-                                        <p><%= detailedAnalysis.storage.conditions %></p>
-                                    </div>
-                                </div>
-                                <div class="storage-item">
-                                    <i class="fas fa-clock"></i>
-                                    <div>
-                                        <h4>Shelf Life</h4>
-                                        <p><%= detailedAnalysis.storage.shelfLife %></p>
-                                    </div>
-                                </div>
-                                <% if (detailedAnalysis.storage.precautions && detailedAnalysis.storage.precautions.length > 0) { %>
-                                    <div class="storage-item">
-                                        <i class="fas fa-exclamation-triangle"></i>
-                                        <div>
-                                            <h4>Precautions</h4>
-                                            <ul>
-                                                <% detailedAnalysis.storage.precautions.forEach(precaution => { %>
-                                                    <li><%= precaution %></li>
-                                                <% }); %>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                <% } %>
-                            <% } else { %>
-                                <p class="no-info">Storage information not available</p>
-                            <% } %>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="analysis-card">
-                    <h3 class="card-title">
-                        <i class="fas fa-leaf"></i>
-                        Environmental Impact
-                    </h3>
-                    <div class="card-content">
-                        <% Object.entries(detailedAnalysis.environmentalImpact).forEach(([key, value]) => { %>
-                            <div class="eco-badge"><%= key %></div>
-                            <p><%= value %></p>
-                        <% }); %>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="button-container">
-            <a href="/" class="button">
+        <div class="action-buttons">
+            <a href="/upload" class="action-button secondary">
+                <i class="fas fa-arrow-left"></i>
+                Scan Another Product
+            </a>
+            <a href="/" class="action-button primary">
                 <i class="fas fa-home"></i>
                 Back to Home
             </a>
-            <a href="/upload" class="button">
-                <i class="fas fa-camera"></i>
-                Scan Another Product
-            </a>
         </div>
     </div>
+
+    <script>
+        // Add smooth scroll behavior
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Add intersection observer for fade-in animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = 1;
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        });
+
+        document.querySelectorAll('.analysis-card').forEach(card => {
+            card.style.opacity = 0;
+            card.style.transform = 'translateY(20px)';
+            observer.observe(card);
+        });
+    </script>
 </body>
 </html>
