@@ -282,8 +282,19 @@ app.get('/final', (req, res) => {
       analysis: analysis
     });
   } catch (err) {
-    res.status(500).render('error', { message: 'Error displaying results' });
+    console.error('Error in final route:', err);
+    res.status(500).render('error', { 
+      message: 'Error displaying results. Please try again.'
+    });
   }
+});
+
+// Add a global error handler
+app.use((err, req, res, next) => {
+  console.error('Global Error:', err);
+  res.status(500).render('error', {
+    message: 'An unexpected error occurred. Please try again.'
+  });
 });
 
 // 7. START SERVER

@@ -3,59 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title || 'Error' %> - ANUGYA</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Error - ANUGYA</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
-        
-        /* Custom styles for better responsiveness */
-        @media (max-width: 768px) {
-            .container-padding {
-                padding: 1rem;
-            }
-            .error-card {
-                width: 90%;
-                margin: 0 auto;
-            }
+        .error-container {
+            text-align: center;
+            padding: 40px 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .error-icon {
+            font-size: 64px;
+            color: var(--danger-color);
+            margin-bottom: 20px;
+        }
+        .error-message {
+            font-size: 18px;
+            color: #fff;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+        }
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(160, 32, 240, 0.4);
         }
     </style>
 </head>
-<body class="bg-black text-white font-[Inter] overflow-x-hidden min-h-screen relative">
-    <!-- Background Images with responsive sizing -->
-    <img src="/assets/IMAGE.png" alt="Top Left" class="absolute top-0 left-0 w-32 h-52 md:w-52 md:h-82 m-2"/>
-    <img src="/assets/IMAGE (1).png" alt="Top Right" class="absolute top-0 right-0 w-32 h-52 md:w-52 md:h-82 m-2"/>
-    <img src="/assets/Untitled design (1) 2 (1).png" alt="Bottom Left" class="absolute bottom-0 left-0 w-32 h-52 md:w-52 md:h-82 m-2"/>
-    <img src="/assets/Untitled design (1) 1.png" alt="Bottom Right" class="absolute bottom-0 right-0 w-32 h-52 md:w-52 md:h-82 m-2"/>
-
-    <div class="container mx-auto px-4 container-padding flex items-center justify-center min-h-screen">
-        <div class="max-w-md w-full bg-white/10 backdrop-blur-lg rounded-lg p-8 shadow-lg">
-            <div class="text-center">
-                <h1 class="text-2xl font-bold mb-4 text-red-400"><%= title || 'Error' %></h1>
-                <div class="mb-6">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                    </svg>
+<body>
+    <div class="container">
+        <h1>ANUGYA</h1>
+        <div class="scanner-box">
+            <div class="error-container">
+                <i class="fas fa-exclamation-circle error-icon"></i>
+                <div class="error-message">
+                    <%= message || 'An error occurred while processing your request.' %>
                 </div>
-                <p class="text-lg mb-4"><%= message %></p>
-                <% if (typeof suggestion !== 'undefined') { %>
-                    <p class="text-gray-300 mb-6"><%= suggestion %></p>
-                <% } %>
-                
-                <% if (typeof imagePath !== 'undefined') { %>
-                    <div class="mb-6">
-                        <p class="text-sm text-gray-400 mb-2">Uploaded Image:</p>
-                        <img src="<%= imagePath %>" alt="Uploaded Image" class="max-w-full h-auto rounded-lg mx-auto" style="max-height: 200px; object-fit: contain;">
-                    </div>
-                <% } %>
-
-                <div class="flex justify-center space-x-4">
-                    <a href="/" class="px-6 py-2 bg-white/10 hover:bg-[#A020F0] transition duration-300 rounded-lg">
-                        Go Home
-                    </a>
-                    <a href="/upload" class="px-6 py-2 bg-white/10 hover:bg-[#A020F0] transition duration-300 rounded-lg">
-                        Try Again
-                    </a>
-                </div>
+                <a href="/" class="back-button">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Home
+                </a>
             </div>
         </div>
     </div>
