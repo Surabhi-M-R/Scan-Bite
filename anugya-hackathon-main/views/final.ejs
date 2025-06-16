@@ -3,257 +3,327 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product Safety Report</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>ANUGYA - Detailed Analysis</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
-        body {
-            font-family: 'Inter', sans-serif;
+        .detailed-analysis {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
-        
-        /* Text-to-speech button */
-        #speakBtn {
-            position: fixed;
-            bottom: 20px;
-            right: 80px;
-            z-index: 40;
-            width: 50px;
-            height: 50px;
-            background-color: #8F00FF;
-            border-radius: 50%;
+        .analysis-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .analysis-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            transition: transform 0.3s ease;
+        }
+        .analysis-card:hover {
+            transform: translateY(-5px);
+        }
+        .card-title {
+            font-size: 1.2em;
+            color: #fff;
+            margin-bottom: 15px;
             display: flex;
-            justify-content: center;
             align-items: center;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-            cursor: pointer;
-            border: none;
+            gap: 10px;
         }
-        
-        #speakBtn:hover {
-            transform: scale(1.1);
-            background-color: #A020F0;
+        .card-content {
+            color: #e0e0e0;
+            line-height: 1.6;
         }
-        
-        #speakBtn.speaking {
-            background-color: #6C73A8;
+        .nutrition-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .nutrition-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .nutrition-value {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #fff;
+        }
+        .nutrition-label {
+            font-size: 0.9em;
+            color: #e0e0e0;
+        }
+        .impact-list {
+            list-style: none;
+            padding: 0;
+        }
+        .impact-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+        .diet-tag {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            margin: 5px;
+            background: var(--gradient-primary);
+        }
+        .storage-info {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .storage-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+        .eco-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin: 5px;
+            background: #00C851;
         }
     </style>
 </head>
-<body class="bg-black text-white overflow-x-hidden relative min-h-screen">
-    <!-- Background images -->
-    <img src="/assets/IMAGE.png" alt="Top Left" class="absolute top-0 left-0 w-52 h-82 m-2"/>
-    <img src="/assets/IMAGE (1).png" alt="Top Right" class="absolute top-0 right-0 w-52 h-82 m-2"/>
-    <img src="/assets/Untitled_design_(1)_2_(1).png" alt="Bottom Left" class="absolute bottom-0 left-0 w-52 h-82 m-2"/>
-    <img src="/assets/Untitled_design_(1)_1.png" alt="Bottom Right" class="absolute bottom-0 right-0 w-52 h-82 m-2"/>
+<body>
+    <div class="container">
+        <h1>Detailed Analysis</h1>
 
-    <div class="max-w-4xl mx-auto p-6 relative z-10">
-        <!-- Product Image and Basic Info -->
-        <div class="text-center">
-            <div class="w-96 h-64 bg-purple-600 mx-auto rounded-lg flex items-center justify-center">
-                <img src="<%= imagePath %>" alt="Product Image" class="w-full h-full object-contain rounded-lg">
-            </div>
-            <h1 class="mt-4 text-2xl font-bold"><%= basicAnalysis.productName %></h1>
-            <p class="text-yellow-400 font-semibold mt-1 text-lg">SAFETY SCORE: <%= detailedAnalysis.safetyRating %>/10</p>
-            <p class="text-yellow-300 text-sm"><%= detailedAnalysis.safetyExplanation %></p>
-        </div>
-
-        <!-- Two Column Layout -->
-        <div class="mt-8 flex flex-col lg:flex-row gap-6" id="ingredientsSection">
-            <!-- Beneficial Ingredients -->
-            <div class="lg:w-1/2 bg-white/10 backdrop-blur-lg p-6 rounded-lg min-h-[300px] border border-white/20 shadow-lg shadow-purple-500">
-                <h2 class="text-green-400 font-bold text-lg">BENEFICIAL INGREDIENTS</h2>
-                <div class="mt-3 text-sm flex justify-between text-green-500 font-semibold">
-                    <p>INGREDIENT</p>
-                    <p>HEALTH BENEFITS</p>
+        <div class="analysis-container">
+            <div class="analysis-section">
+                <h2 class="analysis-title">
+                    <i class="fas fa-box"></i>
+                    Product Information
+                </h2>
+                <div class="analysis-content">
+                    <h3><%= analysis.productName %></h3>
                 </div>
-                <div class="mt-2 text-green-300 text-sm">
-                    <% if(detailedAnalysis.positiveIngredients && detailedAnalysis.positiveIngredients.length > 0) { %>
-                        <% detailedAnalysis.positiveIngredients.forEach(ingredient => { %>
-                            <p class="flex justify-between mt-4">
-                                <span class="font-semibold"><%= ingredient.name %>:</span> 
-                                <span><%= ingredient.benefit %></span>
-                            </p>
+            </div>
+
+            <div class="analysis-section">
+                <h2 class="analysis-title">
+                    <i class="fas fa-list"></i>
+                    Key Ingredients
+                </h2>
+                <div class="analysis-content">
+                    <ul class="ingredient-list">
+                        <% analysis.keyIngredients.forEach(ingredient => { %>
+                            <li class="ingredient-item">
+                                <i class="fas fa-circle"></i>
+                                <%= ingredient %>
+                            </li>
                         <% }); %>
-                    <% } else { %>
-                        <p class="mt-4">No significant beneficial ingredients detected</p>
-                    <% } %>
+                    </ul>
                 </div>
             </div>
 
-            <!-- Concerning Ingredients -->
-            <div class="lg:w-1/2 bg-white/10 backdrop-blur-lg p-6 rounded-lg min-h-[300px] border border-white/20 shadow-lg shadow-purple-500">
-                <h2 class="text-red-500 font-bold text-lg">CONCERNING INGREDIENTS</h2>
-                <div class="mt-3 text-sm text-red-300">
-                    <% if(detailedAnalysis.negativeIngredients && detailedAnalysis.negativeIngredients.length > 0) { %>
-                        <% detailedAnalysis.negativeIngredients.forEach(ingredient => { %>
-                            <p class="flex justify-between mt-4">
-                                <span class="font-semibold"><%= ingredient.name %>:</span> 
-                                <span><%= ingredient.concern %></span>
-                            </p>
+            <div class="analysis-section">
+                <h2 class="analysis-title">
+                    <i class="fas fa-shield-alt"></i>
+                    Safety Assessment
+                </h2>
+                <div class="analysis-content">
+                    <p><%= analysis.safetyAssessment %></p>
+                    <div class="rating-badge">
+                        Safety Rating: <%= analysis.safetyRating.score %>/10
+                    </div>
+                    <p><%= analysis.safetyRating.explanation %></p>
+                </div>
+            </div>
+
+            <% if (analysis.harmfulChemicals && analysis.harmfulChemicals.length > 0) { %>
+                <div class="analysis-section">
+                    <h2 class="analysis-title">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Harmful Chemicals
+                    </h2>
+                    <div class="analysis-content">
+                        <ul class="ingredient-list">
+                            <% analysis.harmfulChemicals.forEach(chemical => { %>
+                                <li class="ingredient-item">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    <%= chemical %>
+                                </li>
+                            <% }); %>
+                        </ul>
+                    </div>
+                </div>
+            <% } %>
+
+            <% if (analysis.healthBenefits && analysis.healthBenefits.length > 0) { %>
+                <div class="analysis-section">
+                    <h2 class="analysis-title">
+                        <i class="fas fa-heart"></i>
+                        Health Benefits
+                    </h2>
+                    <div class="analysis-content">
+                        <ul class="ingredient-list">
+                            <% analysis.healthBenefits.forEach(benefit => { %>
+                                <li class="ingredient-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <%= benefit %>
+                                </li>
+                            <% }); %>
+                        </ul>
+                    </div>
+                </div>
+            <% } %>
+
+            <div class="analysis-section">
+                <h2 class="analysis-title">
+                    <i class="fas fa-info-circle"></i>
+                    Consumption Recommendations
+                </h2>
+                <div class="analysis-content">
+                    <p><%= analysis.consumptionRecommendations %></p>
+                </div>
+            </div>
+
+            <% if (analysis.alternativeProducts && analysis.alternativeProducts.length > 0) { %>
+                <div class="analysis-section">
+                    <h2 class="analysis-title">
+                        <i class="fas fa-exchange-alt"></i>
+                        Alternative Products
+                    </h2>
+                    <div class="analysis-content">
+                        <ul class="ingredient-list">
+                            <% analysis.alternativeProducts.forEach(alternative => { %>
+                                <li class="ingredient-item">
+                                    <i class="fas fa-arrow-right"></i>
+                                    <%= alternative %>
+                                </li>
+                            <% }); %>
+                        </ul>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+
+        <div class="detailed-analysis">
+            <h2 class="analysis-title">
+                <i class="fas fa-chart-bar"></i>
+                Detailed Analysis
+            </h2>
+
+            <div class="analysis-grid">
+                <div class="analysis-card">
+                    <h3 class="card-title">
+                        <i class="fas fa-utensils"></i>
+                        Nutritional Information
+                    </h3>
+                    <div class="card-content">
+                        <div class="nutrition-grid">
+                            <% Object.entries(detailedAnalysis.nutritionalInfo).forEach(([key, value]) => { %>
+                                <div class="nutrition-item">
+                                    <div class="nutrition-value"><%= value %></div>
+                                    <div class="nutrition-label"><%= key %></div>
+                                </div>
+                            <% }); %>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="analysis-card">
+                    <h3 class="card-title">
+                        <i class="fas fa-heartbeat"></i>
+                        Health Impact
+                    </h3>
+                    <div class="card-content">
+                        <ul class="impact-list">
+                            <% Object.entries(detailedAnalysis.healthImpact).forEach(([key, value]) => { %>
+                                <li class="impact-item">
+                                    <i class="fas fa-circle"></i>
+                                    <div>
+                                        <strong><%= key %>:</strong>
+                                        <%= value %>
+                                    </div>
+                                </li>
+                            <% }); %>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="analysis-card">
+                    <h3 class="card-title">
+                        <i class="fas fa-clipboard-list"></i>
+                        Dietary Considerations
+                    </h3>
+                    <div class="card-content">
+                        <% Object.entries(detailedAnalysis.dietaryConsiderations).forEach(([key, value]) => { %>
+                            <div class="diet-tag"><%= key %></div>
+                            <p><%= value %></p>
                         <% }); %>
-                    <% } else { %>
-                        <p class="mt-4">No concerning ingredients detected.</p>
-                    <% } %>
+                    </div>
+                </div>
+
+                <div class="analysis-card">
+                    <h3 class="card-title">
+                        <i class="fas fa-box-open"></i>
+                        Storage and Handling
+                    </h3>
+                    <div class="card-content">
+                        <div class="storage-info">
+                            <% Object.entries(detailedAnalysis.storageAndHandling).forEach(([key, value]) => { %>
+                                <div class="storage-item">
+                                    <i class="fas fa-info-circle"></i>
+                                    <div>
+                                        <strong><%= key %>:</strong>
+                                        <%= value %>
+                                    </div>
+                                </div>
+                            <% }); %>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="analysis-card">
+                    <h3 class="card-title">
+                        <i class="fas fa-leaf"></i>
+                        Environmental Impact
+                    </h3>
+                    <div class="card-content">
+                        <% Object.entries(detailedAnalysis.environmentalImpact).forEach(([key, value]) => { %>
+                            <div class="eco-badge"><%= key %></div>
+                            <p><%= value %></p>
+                        <% }); %>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Harmful Chemicals Section -->
-        <% if(detailedAnalysis.harmfulChemicals && detailedAnalysis.harmfulChemicals.length > 0) { %>
-            <div class="mt-8 p-6 bg-gray-800 text-yellow-400 text-lg rounded-lg" id="harmfulChemicals">
-                <p class="font-bold">HARMFUL CHEMICALS DETECTED:</p>
-                <div class="text-white mt-2 text-sm">
-                    <% detailedAnalysis.harmfulChemicals.forEach(chem => { %>
-                        <p class="mt-2">
-                            <span class="text-yellow-400 font-bold"><%= chem.name %>:</span> 
-                            <%= chem.commonUses %> - <%= chem.healthImpact %>
-                        </p>
-                    <% }); %>
-                </div>
-            </div>
-        <% } %>
-
-        <!-- Final Recommendation -->
-        <div class="mt-8 p-6 bg-gray-800 text-yellow-400 text-lg rounded-lg" id="recommendation">
-            <p class="font-bold">FINAL RECOMMENDATION:</p>
-            <p class="text-white mt-2 text-sm">
-                <%= detailedAnalysis.recommendationReason %>
-            </p>
-        </div>
-
-        <!-- Back Button -->
-        <div class="mt-8 text-center">
-            <button onclick="window.history.back()" class="bg-purple-600 px-8 py-3 rounded-lg text-white font-bold text-lg hover:bg-purple-700 transition">
-                BACK TO SUMMARY
-            </button>
+        <div class="button-container">
+            <a href="/" class="button">
+                <i class="fas fa-home"></i>
+                Back to Home
+            </a>
+            <a href="/upload" class="button">
+                <i class="fas fa-camera"></i>
+                Scan Another Product
+            </a>
         </div>
     </div>
-    
-    <!-- Text-to-Speech Button -->
-    <button id="speakBtn" class="fixed bottom-4 right-20 bg-purple-600 text-white p-3 rounded-full shadow-lg z-50 hover:bg-purple-700 transition">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
-            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-            <line x1="12" y1="19" x2="12" y2="23"></line>
-            <line x1="8" y1="23" x2="16" y2="23"></line>
-        </svg>
-    </button>
-    
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const speakBtn = document.getElementById('speakBtn');
-            let isSpeaking = false;
-            let speechSynth = window.speechSynthesis;
-            
-            function getSpeechContent() {
-                let content = '';
-                
-                // Start with ingredients section
-                const ingredientsSection = document.getElementById('ingredientsSection');
-                if (ingredientsSection) {
-                    const beneficial = ingredientsSection.querySelector('.text-green-300');
-                    const concerning = ingredientsSection.querySelector('.text-red-300');
-                    
-                    if (beneficial) content += 'Beneficial Ingredients. ' + beneficial.textContent + '. ';
-                    if (concerning) content += 'Concerning Ingredients. ' + concerning.textContent + '. ';
-                }
-                
-                // Add harmful chemicals if present
-                const harmfulChemicals = document.getElementById('harmfulChemicals');
-                if (harmfulChemicals) {
-                    content += 'Harmful Chemicals. ' + harmfulChemicals.textContent + '. ';
-                }
-                
-                // Add recommendation
-                const recommendation = document.getElementById('recommendation');
-                if (recommendation) {
-                    content += 'Recommendation. ' + recommendation.textContent;
-                }
-                
-                return content;
-            }
-            
-            speakBtn.addEventListener('click', function() {
-                if (isSpeaking) {
-                    speechSynth.cancel();
-                    isSpeaking = false;
-                    speakBtn.classList.remove('speaking');
-                    speakBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>';
-                    return;
-                }
-                
-                const text = getSpeechContent();
-                if (!text) {
-                    console.error('No content found to read');
-                    return;
-                }
-                
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.rate = 0.9;
-                utterance.pitch = 1;
-                
-                // Try to find a suitable voice
-                const voices = speechSynth.getVoices();
-                if (voices.length > 0) {
-                    const preferredVoice = voices.find(v => v.lang.includes('en')) || voices[0];
-                    utterance.voice = preferredVoice;
-                }
-                
-                utterance.onend = utterance.onerror = function() {
-                    isSpeaking = false;
-                    speakBtn.classList.remove('speaking');
-                    speakBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>';
-                };
-                
-                try {
-                    speechSynth.speak(utterance);
-                    isSpeaking = true;
-                    speakBtn.classList.add('speaking');
-                    speakBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l14 9-14 9V3z"></path><path d="M19 12H5"></path></svg>';
-                } catch (error) {
-                    console.error('Speech synthesis error:', error);
-                    isSpeaking = false;
-                }
-            });
-            
-            // Load voices if needed
-            if (speechSynth.getVoices().length === 0) {
-                speechSynth.onvoiceschanged = function() {
-                    if (speechSynth.getVoices().length > 0) {
-                        speechSynth.onvoiceschanged = null;
-                    }
-                };
-            }
-        });
-    </script>
-
-    <!-- Chat bot -->
-    <script src='https://cdn.jotfor.ms/s/umd/latest/for-embedded-agent.js'></script>
-    <script>
-        window.addEventListener("DOMContentLoaded", function() {
-            window.AgentInitializer.init({
-                agentRenderURL: "https://agent.jotform.com/0195f80d7cda7c97ae5851e84e09e969a625",
-                rootId: "JotformAgent-0195f80d7cda7c97ae5851e84e09e969a625",
-                formID: "0195f80d7cda7c97ae5851e84e09e969a625",
-                queryParams: ["skipWelcome=1", "maximizable=1"],
-                domain: "https://www.jotform.com",
-                isDraggable: false,
-                background: "linear-gradient(180deg, #6C73A8 0%, #6C73A8 100%)",
-                buttonBackgroundColor: "#0066C3",
-                buttonIconColor: "#FFFFFF",
-                variant: false,
-                customizations: {
-                    "greeting": "Yes",
-                    "greetingMessage": "Hi buddy! how can I help you today?",
-                    "openByDefault": "No",
-                    "pulse": "Yes",
-                    "position": "left",
-                    "autoOpenChatIn": "0"
-                },
-                isVoice: undefined
-            });
-        });
-    </script>
 </body>
 </html>

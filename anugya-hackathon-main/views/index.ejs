@@ -3,157 +3,188 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ANUGYA - Upload Image</title>
+    <title>ANUGYA - Food Scanner</title>
     <link rel="stylesheet" href="/styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <div class="container">
         <h1>ANUGYA</h1>
+        
         <div class="scanner-box">
-            <form action="/detail" method="POST" enctype="multipart/form-data" class="scanner" id="uploadForm">
-                <div class="file-upload-container">
-                    <label class="file-upload-label">
-                        <i class="fas fa-cloud-upload-alt file-upload-icon"></i>
-                        <span class="file-upload-text">Choose a file or drag it here</span>
-                        <span class="file-upload-subtext">Supported formats: JPG, PNG, WEBP</span>
-                        <input type="file" name="image" accept="image/*" required id="fileInput">
-                    </label>
-                </div>
-
-                <div class="camera-container">
-                    <button type="button" class="camera-btn" id="startCamera">
-                        <i class="fas fa-camera camera-icon"></i>
-                        <span>Take Photo</span>
-                    </button>
-                </div>
-
+            <form id="uploadForm" action="/detail" method="POST" enctype="multipart/form-data">
                 <div class="camera-preview" id="cameraPreview">
-                    <video id="video" autoplay playsinline></video>
-                    <img id="capturedImage" style="display: none;">
-                    <div class="camera-controls">
-                        <button type="button" class="capture-btn" id="captureBtn">
-                            <i class="fas fa-camera"></i> Capture
-                        </button>
-                        <button type="button" class="cancel-btn" id="cancelBtn">
-                            <i class="fas fa-times"></i> Cancel
-                        </button>
+                    <video id="video" autoplay playsinline style="display: none;"></video>
+                    <canvas id="canvas" style="display: none;"></canvas>
+                    <img id="previewImage" class="preview-image" style="display: none;">
+                    <div id="placeholder" class="placeholder">
+                        <i class="fas fa-camera"></i>
+                        <p>Click to upload or use camera</p>
                     </div>
                 </div>
 
-                <button type="submit" id="submitBtn">Scan Product</button>
+                <div class="button-container">
+                    <input type="file" id="fileInput" name="image" accept="image/*" style="display: none;">
+                    <button type="button" class="button" id="uploadBtn">
+                        <i class="fas fa-upload"></i>
+                        Upload Image
+                    </button>
+                    <button type="button" class="button" id="cameraBtn">
+                        <i class="fas fa-camera"></i>
+                        Use Camera
+                    </button>
+                    <button type="button" class="button" id="captureBtn" style="display: none;">
+                        <i class="fas fa-camera"></i>
+                        Capture
+                    </button>
+                    <button type="button" class="button" id="cancelBtn" style="display: none;">
+                        <i class="fas fa-times"></i>
+                        Cancel
+                    </button>
+                </div>
+
+                <button type="submit" class="button" id="submitBtn" style="display: none;">
+                    <i class="fas fa-search"></i>
+                    Analyze
+                </button>
             </form>
         </div>
     </div>
 
     <script>
-        const startCameraBtn = document.getElementById('startCamera');
-        const cameraPreview = document.getElementById('cameraPreview');
-        const video = document.getElementById('video');
-        const capturedImage = document.getElementById('capturedImage');
-        const captureBtn = document.getElementById('captureBtn');
-        const cancelBtn = document.getElementById('cancelBtn');
-        const submitBtn = document.getElementById('submitBtn');
-        const fileInput = document.getElementById('fileInput');
-        const uploadForm = document.getElementById('uploadForm');
-        let stream = null;
+        document.addEventListener('DOMContentLoaded', function() {
+            const uploadForm = document.getElementById('uploadForm');
+            const fileInput = document.getElementById('fileInput');
+            const uploadBtn = document.getElementById('uploadBtn');
+            const cameraBtn = document.getElementById('cameraBtn');
+            const captureBtn = document.getElementById('captureBtn');
+            const cancelBtn = document.getElementById('cancelBtn');
+            const submitBtn = document.getElementById('submitBtn');
+            const cameraPreview = document.getElementById('cameraPreview');
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            const previewImage = document.getElementById('previewImage');
+            const placeholder = document.getElementById('placeholder');
 
-        // Handle file input change
-        fileInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    capturedImage.src = e.target.result;
-                    cameraPreview.classList.add('active');
-                    video.style.display = 'none';
-                    capturedImage.style.display = 'block';
-                    captureBtn.style.display = 'none';
-                };
-                reader.readAsDataURL(file);
-            }
-        });
+            let stream = null;
 
-        // Start camera
-        startCameraBtn.addEventListener('click', async () => {
-            try {
-                stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { 
-                        facingMode: 'environment',
-                        width: { ideal: 1280 },
-                        height: { ideal: 720 }
-                    } 
-                });
-                video.srcObject = stream;
-                cameraPreview.classList.add('active');
-                startCameraBtn.style.display = 'none';
-                capturedImage.style.display = 'none';
-                video.style.display = 'block';
-                captureBtn.style.display = 'block';
-            } catch (err) {
-                console.error('Error accessing camera:', err);
-                alert('Could not access camera. Please make sure you have granted camera permissions.');
-            }
-        });
+            // Upload button click handler
+            uploadBtn.addEventListener('click', () => {
+                fileInput.click();
+            });
 
-        // Capture photo
-        captureBtn.addEventListener('click', () => {
-            const canvas = document.createElement('canvas');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            canvas.getContext('2d').drawImage(video, 0, 0);
-            
-            // Convert canvas to blob
-            canvas.toBlob((blob) => {
-                const file = new File([blob], 'camera_capture.jpg', { type: 'image/jpeg' });
-                const dataTransfer = new DataTransfer();
-                dataTransfer.items.add(file);
-                fileInput.files = dataTransfer.files;
+            // File input change handler
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files && e.target.files[0]) {
+                    const file = e.target.files[0];
+                    const reader = new FileReader();
+                    
+                    reader.onload = (e) => {
+                        previewImage.src = e.target.result;
+                        previewImage.style.display = 'block';
+                        placeholder.style.display = 'none';
+                        submitBtn.style.display = 'block';
+                    };
+                    
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Camera button click handler
+            cameraBtn.addEventListener('click', async () => {
+                try {
+                    stream = await navigator.mediaDevices.getUserMedia({ 
+                        video: { 
+                            facingMode: 'environment',
+                            width: { ideal: 1920 },
+                            height: { ideal: 1080 }
+                        } 
+                    });
+                    
+                    video.srcObject = stream;
+                    video.style.display = 'block';
+                    placeholder.style.display = 'none';
+                    captureBtn.style.display = 'block';
+                    cancelBtn.style.display = 'block';
+                    cameraBtn.style.display = 'none';
+                    uploadBtn.style.display = 'none';
+                } catch (err) {
+                    console.error('Error accessing camera:', err);
+                    alert('Error accessing camera. Please make sure you have granted camera permissions.');
+                }
+            });
+
+            // Capture button click handler
+            captureBtn.addEventListener('click', () => {
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                canvas.getContext('2d').drawImage(video, 0, 0);
                 
-                // Display captured image
-                capturedImage.src = canvas.toDataURL('image/jpeg');
+                const imageData = canvas.toDataURL('image/jpeg');
+                previewImage.src = imageData;
+                previewImage.style.display = 'block';
                 video.style.display = 'none';
-                capturedImage.style.display = 'block';
                 captureBtn.style.display = 'none';
-            }, 'image/jpeg');
-        });
+                submitBtn.style.display = 'block';
 
-        // Cancel camera
-        cancelBtn.addEventListener('click', () => {
-            if (stream) {
-                stream.getTracks().forEach(track => track.stop());
-            }
-            cameraPreview.classList.remove('active');
-            startCameraBtn.style.display = 'flex';
-            video.style.display = 'block';
-            capturedImage.style.display = 'none';
-            captureBtn.style.display = 'block';
-            fileInput.value = '';
-        });
+                // Stop camera stream
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                    stream = null;
+                }
+            });
 
-        // Handle form submission
-        uploadForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            if (!fileInput.files[0]) {
-                alert('Please select an image or take a photo first.');
-                return;
-            }
+            // Cancel button click handler
+            cancelBtn.addEventListener('click', () => {
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                    stream = null;
+                }
+                
+                video.style.display = 'none';
+                previewImage.style.display = 'none';
+                placeholder.style.display = 'block';
+                captureBtn.style.display = 'none';
+                cancelBtn.style.display = 'none';
+                submitBtn.style.display = 'none';
+                cameraBtn.style.display = 'block';
+                uploadBtn.style.display = 'block';
+            });
 
-            // Show loading state
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Scanning...';
+            // Form submit handler
+            uploadForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const formData = new FormData();
+                const file = fileInput.files[0];
+                
+                if (file) {
+                    formData.append('image', file);
+                } else if (previewImage.src) {
+                    // Convert base64 to blob
+                    const response = await fetch(previewImage.src);
+                    const blob = await response.blob();
+                    formData.append('image', blob, 'camera.jpg');
+                } else {
+                    alert('Please select an image or take a photo first.');
+                    return;
+                }
 
-            // Submit the form
-            this.submit();
-        });
+                // Show loading state
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
 
-        // Clean up camera when leaving page
-        window.addEventListener('beforeunload', () => {
-            if (stream) {
-                stream.getTracks().forEach(track => track.stop());
-            }
+                try {
+                    // Submit the form directly instead of using fetch
+                    uploadForm.submit();
+                } catch (err) {
+                    console.error('Error uploading image:', err);
+                    alert('Error uploading image. Please try again.');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-search"></i> Analyze';
+                }
+            });
         });
     </script>
 </body>

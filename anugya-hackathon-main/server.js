@@ -10,12 +10,17 @@ const fs = require('fs');
 const app = express();
 
 // 1. GEMINI AI INIT
+if (!process.env.GEMINI_API_KEY) {
+  console.error('Error: GEMINI_API_KEY is not set in environment variables');
+  process.exit(1);
+}
+
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ 
   model: "gemini-1.5-flash",
   apiVersion: "v1"
 });
-//new
+
 // 2. APP CONFIGURATION
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -23,8 +28,16 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Create uploads directory if it doesn't exist
 const uploadDir = path.join(__dirname, 'public', 'uploads');
-if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+if (!fs.existsSync(uploadDir)) {
+  try {
+    fs.mkdirSync(uploadDir, { recursive: true });
+  } catch (err) {
+    console.error('Error creating uploads directory:', err);
+    process.exit(1);
+  }
+}
 
 // 3. FILE UPLOAD SETUP
 const upload = multer({
@@ -34,196 +47,238 @@ const upload = multer({
   }),
   fileFilter: (req, file, cb) => {
     const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
-    cb(null, validTypes.includes(file.mimetype));
+    if (!validTypes.includes(file.mimetype)) {
+      return cb(new Error('Invalid file type. Only JPEG, PNG, and WebP images are allowed.'));
+    }
+    cb(null, true);
   },
-  limits: { fileSize: 5 * 1024 * 1024 }
+  limits: { 
+    fileSize: 5 * 1024 * 1024,
+    files: 1
+  }
 });
 
 // 4. IMAGE PROCESSING
 async function preprocessImage(imagePath) {
-  const processedPath = path.join(uploadDir, 'processed_' + path.basename(imagePath));
-  await sharp(imagePath)
-    .greyscale()
-    .normalize()
-    .linear(1.1)
-    .sharpen()
-    .toFile(processedPath);
-  return processedPath;
+  try {
+    console.log('Starting image preprocessing...');
+    const processedPath = path.join(uploadDir, 'processed_' + path.basename(imagePath));
+    
+    await sharp(imagePath)
+      .greyscale()
+      .normalize()
+      .linear(1.1)
+      .sharpen()
+      .threshold(128) // Add threshold for better text contrast
+      .modulate({
+        brightness: 1.2, // Increase brightness
+        saturation: 0 // Remove color
+      })
+      .toFile(processedPath);
+
+    console.log('Image preprocessing completed');
+    return processedPath;
+  } catch (err) {
+    console.error('Image preprocessing error:', err);
+    throw new Error('Failed to process image. Please try again with a different image.');
+  }
 }
 
 async function extractText(imagePath) {
-  const { data: { text } } = await Tesseract.recognize(
-    imagePath,
-    'eng',
-    // { logger: m => console.log(m.status) }
-  );
-  return text;
+  try {
+    console.log('Starting text extraction...');
+    const { data: { text } } = await Tesseract.recognize(
+      imagePath,
+      'eng',
+      { 
+        logger: m => {
+          if (m.status === 'recognizing text') {
+            console.log('Progress:', m.progress);
+          } else {
+            console.log(m.status);
+          }
+        },
+        tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.,;:()[]{}@#$%^&*!?-_=+<>/\\|"\' ',
+        tessedit_pageseg_mode: '6' // Assume uniform text block
+      }
+    );
+
+    console.log('Text extraction completed');
+    
+    if (!text || text.trim().length === 0) {
+      throw new Error('No text could be extracted from the image. Please try again with a clearer image.');
+    }
+
+    // Clean up the extracted text
+    const cleanedText = text
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    console.log('Extracted text sample:', cleanedText.substring(0, 100) + '...');
+    return cleanedText;
+  } catch (err) {
+    console.error('Text extraction error:', err);
+    throw new Error('Failed to extract text from image. Please try again with a clearer image.');
+  }
 }
 
-// 5. GEMINI ANALYSIS (Updated prompt)
+// 5. GEMINI ANALYSIS
 async function analyzeIngredients(ingredients) {
   try {
-    const prompt = `Analyze these food ingredients and provide a concise 4-line response: give user friendly word not complex words, and dont repeat same things
-    1. Key ingredients detected (top 3-4)
-    2. Safety assessment based on FSSAI/WHO guidelines , give proper suggestion for at least 2 or 3 sentence, no complex words, simple to understand, which they need to follow.
-    3. 1-10 safety rating with brief explanation
-    4. Harmful chemicals detection (if any)
-    
-    Ingredients: ${ingredients.substring(0, 5000)}
-    
-    Format response as JSON:
+    if (!ingredients || ingredients.trim().length === 0) {
+      throw new Error('No ingredients text provided for analysis');
+    }
+
+    const prompt = `Analyze these food ingredients and provide a safety assessment. Ingredients: ${ingredients.substring(0, 5000)}
+
+    Provide the analysis in this exact JSON format:
     {
       "productName": "string",
-      "keyIngredients": ["list"],
-      "safetyAssessment": "string",
+      "keyIngredients": ["list of main ingredients"],
+      "safetyAssessment": {
+        "isSafe": boolean,
+        "reason": "string",
+        "warnings": ["list of warnings if any"]
+      },
       "safetyRating": {
         "score": number,
         "explanation": "string"
       },
-      "harmfulChemicals": ["list"] 
-    }`;
-    
+      "harmfulChemicals": ["list of harmful chemicals if any"],
+      "healthBenefits": ["list of health benefits if any"],
+      "consumptionRecommendations": "string",
+      "alternativeProducts": ["list of safer alternatives if any"]
+    }
+
+    Focus on safety and health aspects. If any information is not available, use appropriate default values.`;
+
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
     
-    const cleanText = text.replace(/```json|```/g, '');
-    return JSON.parse(cleanText);
+    // Clean the response text
+    const cleanText = text.replace(/```json|```/g, '').trim();
+    
+    try {
+      const analysis = JSON.parse(cleanText);
+      
+      // Validate required fields
+      if (!analysis.productName || !analysis.safetyAssessment || !analysis.safetyRating) {
+        throw new Error('Invalid analysis response format');
+      }
+      
+      return analysis;
+    } catch (parseError) {
+      console.error('JSON Parse Error:', parseError);
+      console.error('Raw response:', cleanText);
+      throw new Error('Failed to parse analysis response');
+    }
   } catch (err) {
-    console.error('Gemini Error:', err);
+    console.error('Gemini Analysis Error:', err);
     throw new Error('AI analysis failed. Please try again with clearer text.');
   }
 }
 
-// Add this new function in your server.js (around line 70)
-async function detailedAnalysis(ingredients, productName) {
+// 6. DETAILED ANALYSIS
+async function getDetailedAnalysis(ingredients, productName) {
   try {
-    const prompt = `Analyze the food product "${productName}" for a comprehensive health assessment. Provide:
-    
-    1. Ingredient Breakdown (as JSON arrays):
-       - positiveIngredients: [{name: string, benefit: string}], so it must include min 5 points, its ok even if no ingridients are there, just include its general information
-       - negativeIngredients: [{name: string, concern: string}], so it must include min 5 points,its ok even if no ingridients are there, just include its general information
-    
-    2. Safety Evaluation:
-       - safetyRating: number (1-10)
-       - safetyExplanation: string
-    
-    3. Harmful Chemicals:
-       - harmfulChemicals: [{name: string, commonUses: string, healthImpact: string}]
-    
-    4. Consumption Recommendation:
-       - recommendation: string
-       - recommendationReason: string
-    
-    Ingredients: ${ingredients.substring(0, 5000)}
-    
-    Format response as JSON. Use simple language.`;
+    if (!ingredients || !productName) {
+      throw new Error('Missing required parameters for detailed analysis');
+    }
+
+    const prompt = `Analyze this food product "${productName}" with ingredients: ${ingredients.substring(0, 5000)}
+
+    Provide a detailed analysis in the following JSON format:
+    {
+      "nutritionalInfo": {
+        "calories": "string",
+        "macronutrients": {
+          "protein": "string",
+          "carbs": "string",
+          "fats": "string"
+        },
+        "vitamins": ["list"],
+        "minerals": ["list"]
+      },
+      "healthImpact": {
+        "shortTerm": "string",
+        "longTerm": "string",
+        "risks": ["list"]
+      },
+      "dietaryConsiderations": {
+        "suitableFor": ["list"],
+        "restrictions": ["list"],
+        "allergies": ["list"]
+      },
+      "storage": {
+        "conditions": "string",
+        "shelfLife": "string",
+        "precautions": ["list"]
+      },
+      "environmentalImpact": {
+        "packaging": "string",
+        "sustainability": "string",
+        "ecoFriendliness": "string"
+      }
+    }
+
+    Focus on safety and health aspects. If any information is not available, use "Not specified" as the value.`;
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
-    return JSON.parse(text.replace(/```json|```/g, ''));
+    
+    // Clean the response text
+    const cleanText = text.replace(/```json|```/g, '').trim();
+    
+    try {
+      const analysis = JSON.parse(cleanText);
+      
+      // Validate the structure
+      if (!analysis.nutritionalInfo || !analysis.healthImpact) {
+        throw new Error('Invalid response structure');
+      }
+      
+      return analysis;
+    } catch (parseError) {
+      console.error('JSON Parse Error:', parseError);
+      console.error('Raw response:', cleanText);
+      throw new Error('Failed to parse analysis response');
+    }
   } catch (err) {
     console.error('Detailed Analysis Error:', err);
-    throw new Error('Detailed analysis failed');
+    throw new Error('Detailed analysis failed. Please try again.');
   }
 }
 
-// Update your /final route (around line 140)
-// In your server.js file, update the /final route:
-app.get('/final', async (req, res) => {
-  try {
-    const analysis = JSON.parse(decodeURIComponent(req.query.analysis));
-    const imagePath = req.query.imagePath;
-    
-    // Ensure we have all required data
-    if (!analysis.safetyRating || typeof analysis.safetyRating.score === 'undefined') {
-      throw new Error('Invalid analysis data');
-    }
-
-    // Transform the data structure if needed
-    const detailedAnalysis = {
-      safetyRating: analysis.safetyRating.score,
-      safetyExplanation: analysis.safetyRating.explanation,
-      positiveIngredients: analysis.keyIngredients.map(ing => ({
-        name: ing,
-        benefit: `Natural ingredient found in ${ing.toLowerCase().includes('oil') ? 'healthy foods' : 'many foods'}`
-      })),
-      negativeIngredients: analysis.harmfulChemicals.map(chem => ({
-        name: chem,
-        concern: 'Potential health risks with regular consumption'
-      })),
-      harmfulChemicals: analysis.harmfulChemicals.map(chem => ({
-        name: chem,
-        commonUses: getCommonUses(chem),
-        healthImpact: getHealthImpact(chem)
-      })),
-      recommendationReason: analysis.safetyAssessment || 'Based on ingredient analysis'
-    };
-
-    res.render('final', {
-      imagePath: imagePath,
-      basicAnalysis: {
-        productName: analysis.productName || 'Scanned Product'
-      },
-      detailedAnalysis: detailedAnalysis
-    });
-  } catch (err) {
-    console.error('Error in final route:', err);
-    res.status(500).render('error', { message: 'Error displaying detailed results' });
-  }
-});
-
-// Helper functions
-function getCommonUses(chemical) {
-  const uses = {
-    'Trans Fats': 'Used in processed foods to extend shelf life',
-    'High Levels of Saturated Fat': 'Found in fried and processed foods',
-    'Artificial Flavors/Additives': 'Enhance taste and appearance in processed foods',
-    'MSG': 'Flavor enhancer in many packaged foods'
-  };
-  return uses[chemical] || 'Common food additive';
-}
-
-function getHealthImpact(chemical) {
-  const impacts = {
-    'Trans Fats': 'Increases bad cholesterol and heart disease risk',
-    'High Levels of Saturated Fat': 'Can raise cholesterol levels',
-    'Artificial Flavors/Additives': 'Potential unknown long-term effects',
-    'MSG': 'May cause headaches in sensitive individuals'
-  };
-  return impacts[chemical] || 'Potential health concerns with regular consumption';
-}
-
-// 6. ROUTES
-
-
+// 7. ROUTES
 app.get('/', (req, res) => {
   res.render('homepage', {
-      title: 'ANUGYA',
-      appName: 'ANUGYA',
-      tagline: 'YOUR HEALTH SCANNER',
-      description: 'Building a web application to scan packaged food products to know the ingredients and suitability to consume according to user health conditions and many more features.',
-      workflowSteps: [
-          {
-              image: '/assets/Frame.png',
-              title: 'UPLOAD',
-              description: 'Upload an image of a packaged food product to analyze its ingredients.'
-          },
-          {
-              image: '/assets/IMAGE (2).png',
-              title: 'GET RESULT',
-              description: 'AI scans and detects the ingredients, highlighting potential health risks.'
-          },
-          {
-              image: '/assets/IMAGE (3).png',
-              title: 'PERSONAL ADVICE',
-              description: 'Receive a health rating, consumption recommendations, and better alternatives.'
-          }
-      ],
-      ctaText: 'GET STARTED'
+    title: 'ANUGYA',
+    appName: 'ANUGYA',
+    tagline: 'YOUR HEALTH SCANNER',
+    description: 'Building a web application to scan packaged food products to know the ingredients and suitability to consume according to user health conditions and many more features.',
+    workflowSteps: [
+      {
+        image: '/assets/Frame.png',
+        title: 'UPLOAD',
+        description: 'Upload an image of a packaged food product to analyze its ingredients.'
+      },
+      {
+        image: '/assets/IMAGE (2).png',
+        title: 'GET RESULT',
+        description: 'AI scans and detects the ingredients, highlighting potential health risks.'
+      },
+      {
+        image: '/assets/IMAGE (3).png',
+        title: 'PERSONAL ADVICE',
+        description: 'Receive a health rating, consumption recommendations, and better alternatives.'
+      }
+    ],
+    ctaText: 'GET STARTED'
   });
 });
+
 app.get('/upload', (req, res) => res.render('index'));
 
 app.post('/detail', upload.single('image'), async (req, res) => {
@@ -231,55 +286,81 @@ app.post('/detail', upload.single('image'), async (req, res) => {
     let imagePath;
     let filename;
 
-    if (req.file) {
-      // Handle file upload
-      imagePath = req.file.path;
-      filename = req.file.filename;
-    } else if (req.body.cameraImage) {
-      // Handle camera capture (base64)
-      const matches = req.body.cameraImage.match(/^data:image\/(\w+);base64,(.+)$/);
-      if (!matches) throw new Error('Invalid image data');
-      
-      const ext = matches[1] === 'jpeg' ? 'jpg' : matches[1];
-      filename = `camera_${Date.now()}.${ext}`;
-      imagePath = path.join(uploadDir, filename);
-      
-      await fs.promises.writeFile(imagePath, matches[2], 'base64');
-    } else {
-      throw new Error('No image data received');
+    if (!req.file) {
+      throw new Error('No image file received. Please try again.');
     }
 
-    // Process and analyze the image
+    imagePath = req.file.path;
+    filename = req.file.filename;
+
+    console.log('Processing image:', imagePath);
+
+    // Preprocess the image
     const processedPath = await preprocessImage(imagePath);
+    console.log('Image preprocessed:', processedPath);
+
+    // Extract text from the image
     const text = await extractText(processedPath);
+    console.log('Text extracted:', text.substring(0, 100) + '...');
+
+    if (!text || text.trim().length === 0) {
+      throw new Error('Could not read text from the image. Please try again with a clearer image.');
+    }
+
+    // Analyze the ingredients
     const analysis = await analyzeIngredients(text);
+    console.log('Basic analysis completed');
 
-    // Cleanup
-    fs.unlinkSync(processedPath);
+    // Get detailed analysis
+    const detailedAnalysis = await getDetailedAnalysis(text, analysis.productName);
+    console.log('Detailed analysis completed');
 
-    // Render the initial view with image and brief analysis
+    // Cleanup processed image
+    try {
+      fs.unlinkSync(processedPath);
+      console.log('Processed image cleaned up');
+    } catch (err) {
+      console.error('Error cleaning up processed image:', err);
+    }
+
+    // Render the results
     res.render('detail', {
       imagePath: `/uploads/${filename}`,
-      analysis: analysis
+      analysis: analysis,
+      detailedAnalysis: detailedAnalysis
     });
     
   } catch (err) {
     console.error('Upload Error:', err);
+    
+    // Clean up any uploaded files in case of error
+    if (req.file) {
+      try {
+        fs.unlinkSync(req.file.path);
+      } catch (cleanupErr) {
+        console.error('Error cleaning up uploaded file:', cleanupErr);
+      }
+    }
+
     res.status(500).render('error', { 
-      message: err.message.includes('AI analysis') ? 
-               'AI analysis failed. Please try again with clearer text.' : 
-               err.message
+      message: err.message || 'An error occurred while processing your image. Please try again.'
     });
   }
 });
 
-// Route for detailed view
 app.get('/final', (req, res) => {
   try {
+    if (!req.query.analysis || !req.query.detailedAnalysis || !req.query.imagePath) {
+      throw new Error('Missing required parameters');
+    }
+
     const analysis = JSON.parse(decodeURIComponent(req.query.analysis));
+    const detailedAnalysis = JSON.parse(decodeURIComponent(req.query.detailedAnalysis));
+    
     res.render('final', {
       imagePath: req.query.imagePath,
-      analysis: analysis
+      analysis: analysis,
+      detailedAnalysis: detailedAnalysis
     });
   } catch (err) {
     console.error('Error in final route:', err);
@@ -289,7 +370,7 @@ app.get('/final', (req, res) => {
   }
 });
 
-// Add a global error handler
+// Global error handler
 app.use((err, req, res, next) => {
   console.error('Global Error:', err);
   res.status(500).render('error', {
@@ -297,9 +378,12 @@ app.use((err, req, res, next) => {
   });
 });
 
-// 7. START SERVER
+// 8. START SERVER
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+  console.log('Environment:', process.env.NODE_ENV || 'development');
+});
 
 
 // Mood-based food recommendations route

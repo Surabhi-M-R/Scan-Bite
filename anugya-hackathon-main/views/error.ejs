@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Error - ANUGYA</title>
+    <title>ANUGYA - Error</title>
     <link rel="stylesheet" href="/styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         .error-container {
             text-align: center;
@@ -48,18 +48,29 @@
 </head>
 <body>
     <div class="container">
-        <h1>ANUGYA</h1>
-        <div class="scanner-box">
-            <div class="error-container">
-                <i class="fas fa-exclamation-circle error-icon"></i>
-                <div class="error-message">
-                    <%= message || 'An error occurred while processing your request.' %>
+        <h1>Error</h1>
+
+        <div class="analysis-container">
+            <div class="analysis-section">
+                <h2 class="analysis-title">
+                    <i class="fas fa-exclamation-circle"></i>
+                    Something went wrong
+                </h2>
+                <div class="analysis-content">
+                    <p><%= message %></p>
                 </div>
-                <a href="/" class="back-button">
-                    <i class="fas fa-arrow-left"></i>
-                    Back to Home
-                </a>
             </div>
+        </div>
+
+        <div class="button-container">
+            <a href="/" class="button">
+                <i class="fas fa-home"></i>
+                Back to Home
+            </a>
+            <a href="/upload" class="button">
+                <i class="fas fa-camera"></i>
+                Try Again
+            </a>
         </div>
     </div>
 </body>

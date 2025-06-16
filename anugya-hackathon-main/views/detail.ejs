@@ -3,254 +3,372 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scan Results</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>ANUGYA - Analysis Results</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
-        
-        @keyframes glow {
-          0% { box-shadow: 0 0 5px rgba(0, 255, 0, 0.8); }
-          50% { box-shadow: 0 0 15px rgba(0, 255, 0, 1); }
-          100% { box-shadow: 0 0 5px rgba(0, 255, 0, 0.8); }
+        .analysis-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
-        .glow-green { animation: glow 1.5s infinite alternate; }
-        .glow-yellow { 
-          animation: glow 1.5s infinite alternate; 
-          box-shadow: 0 0 10px rgba(255, 223, 0, 0.8); 
+        .analysis-section {
+            margin-bottom: 25px;
         }
-        .glow-red { 
-          animation: glow 1.5s infinite alternate; 
-          box-shadow: 0 0 10px rgba(255, 0, 0, 0.8); 
-        }
-        
-        /* Text-to-speech button */
-        #speakBtn {
-            position: fixed;
-            bottom: 20px;
-            right: 80px;
-            z-index: 40;
-            width: 50px;
-            height: 50px;
-            background-color: #8F00FF;
-            border-radius: 50%;
+        .analysis-title {
+            font-size: 1.2em;
+            color: #fff;
+            margin-bottom: 15px;
             display: flex;
-            justify-content: center;
             align-items: center;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-            cursor: pointer;
-            border: none;
+            gap: 10px;
         }
-        
-        #speakBtn:hover {
-            transform: scale(1.1);
-            background-color: #A020F0;
+        .analysis-content {
+            color: #e0e0e0;
+            line-height: 1.6;
         }
-        
-        #speakBtn.speaking {
-            background-color: #6C73A8;
+        .ingredient-list {
+            list-style: none;
+            padding: 0;
+        }
+        .ingredient-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+        .rating-badge {
+            background: var(--gradient-primary);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            color: white;
+        }
+        .warning-badge {
+            background: #ff4444;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            color: white;
+        }
+        .benefit-badge {
+            background: #00C851;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            color: white;
         }
     </style>
 </head>
-<body class="bg-black text-white font-[Inter] overflow-x-hidden flex items-center justify-center min-h-screen relative flex-col">
-    <!-- Background images -->
-    <img src="/assets/IMAGE.png" alt="Top Left" class="absolute top-0 left-0 w-52 h-82 m-2"/>
-    <img src="/assets/IMAGE (1).png" alt="Top Right" class="absolute top-0 right-0 w-52 h-82 m-2"/>
-    <img src="/assets/Untitled_design_(1)_2_(1).png" alt="Bottom Left" class="absolute bottom-0 left-0 w-52 h-82 m-2"/>
-    <img src="/assets/Untitled_design_(1)_1.png" alt="Bottom Right" class="absolute bottom-0 right-0 w-52 h-82 m-2"/>
-    
-    <!-- Text-to-Speech Button -->
-    <button id="speakBtn" aria-label="Read results aloud">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
-            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-            <line x1="12" y1="19" x2="12" y2="23"></line>
-            <line x1="8" y1="23" x2="16" y2="23"></line>
-        </svg>
-    </button>
+<body>
+    <div class="container">
+        <h1>Analysis Results</h1>
 
-    <!-- Main Content -->
-    <div class="flex flex-col items-center z-10 w-full max-w-4xl px-4">
-        <div class="bg-purple-600 w-96 h-64 flex items-center justify-center text-xl font-bold rounded-lg shadow-lg mt-4">
-            <% if (imagePath) { %>
-                <img src="<%= imagePath %>" alt="Scanned product" class="w-full h-full object-contain rounded-lg">
-            <% } else { %>
-                <p class="text-center">No image available</p>
+        <div class="analysis-container">
+            <div class="analysis-section">
+                <h2 class="analysis-title">
+                    <i class="fas fa-box"></i>
+                    Product Information
+                </h2>
+                <div class="analysis-content">
+                    <h3><%= analysis.productName %></h3>
+                </div>
+            </div>
+
+            <div class="analysis-section">
+                <h2 class="analysis-title">
+                    <i class="fas fa-list"></i>
+                    Key Ingredients
+                </h2>
+                <div class="analysis-content">
+                    <ul class="ingredient-list">
+                        <% analysis.keyIngredients.forEach(ingredient => { %>
+                            <li class="ingredient-item">
+                                <i class="fas fa-circle"></i>
+                                <%= ingredient %>
+                            </li>
+                        <% }); %>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="analysis-section">
+                <h2 class="analysis-title">
+                    <i class="fas fa-shield-alt"></i>
+                    Safety Assessment
+                </h2>
+                <div class="analysis-content">
+                    <p><%= analysis.safetyAssessment %></p>
+                    <div class="rating-badge">
+                        Safety Rating: <%= analysis.safetyRating.score %>/10
+                    </div>
+                    <p><%= analysis.safetyRating.explanation %></p>
+                </div>
+            </div>
+
+            <% if (analysis.harmfulChemicals && analysis.harmfulChemicals.length > 0) { %>
+                <div class="analysis-section">
+                    <h2 class="analysis-title">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Harmful Chemicals
+                    </h2>
+                    <div class="analysis-content">
+                        <ul class="ingredient-list">
+                            <% analysis.harmfulChemicals.forEach(chemical => { %>
+                                <li class="ingredient-item">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    <%= chemical %>
+                                </li>
+                            <% }); %>
+                        </ul>
+                    </div>
+                </div>
+            <% } %>
+
+            <% if (analysis.healthBenefits && analysis.healthBenefits.length > 0) { %>
+                <div class="analysis-section">
+                    <h2 class="analysis-title">
+                        <i class="fas fa-heart"></i>
+                        Health Benefits
+                    </h2>
+                    <div class="analysis-content">
+                        <ul class="ingredient-list">
+                            <% analysis.healthBenefits.forEach(benefit => { %>
+                                <li class="ingredient-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <%= benefit %>
+                                </li>
+                            <% }); %>
+                        </ul>
+                    </div>
+                </div>
+            <% } %>
+
+            <div class="analysis-section">
+                <h2 class="analysis-title">
+                    <i class="fas fa-info-circle"></i>
+                    Consumption Recommendations
+                </h2>
+                <div class="analysis-content">
+                    <p><%= analysis.consumptionRecommendations %></p>
+                </div>
+            </div>
+
+            <% if (analysis.alternativeProducts && analysis.alternativeProducts.length > 0) { %>
+                <div class="analysis-section">
+                    <h2 class="analysis-title">
+                        <i class="fas fa-exchange-alt"></i>
+                        Alternative Products
+                    </h2>
+                    <div class="analysis-content">
+                        <ul class="ingredient-list">
+                            <% analysis.alternativeProducts.forEach(alternative => { %>
+                                <li class="ingredient-item">
+                                    <i class="fas fa-arrow-right"></i>
+                                    <%= alternative %>
+                                </li>
+                            <% }); %>
+                        </ul>
+                    </div>
+                </div>
             <% } %>
         </div>
 
-        <button class="mt-8 px-6 py-2 bg-[#8F00FF] text-white font-bold rounded-r-full rounded-l-full shadow-lg hover:bg-[#A020F0]">
-            Tap to save the product
-        </button>
-        
-        <div class="flex flex-wrap justify-center gap-4 md:gap-24 mt-8">
-            <button class="px-6 py-2 <%= analysis.safetyRating.score >= 8 ? 'bg-[#8F00FF]' : 'bg-[#8F00FF]/50' %> text-white font-bold rounded-r-full rounded-l-full shadow-lg hover:bg-[#A020F0]">
-                Low Hazard
-            </button>
-            <button class="px-6 py-2 <%= analysis.safetyRating.score < 8 ? 'bg-[#F0C42D]' : 'bg-[#F0C42D]/50' %> text-white font-bold rounded-r-full rounded-l-full shadow-lg hover:bg-[#E1AD01]">
-                Potential Hazard
-            </button>
-        </div>
+        <div class="detailed-analysis">
+            <h2 class="analysis-title">
+                <i class="fas fa-chart-bar"></i>
+                Detailed Analysis
+            </h2>
 
-        <div class="relative w-full max-w-[600px] h-12 rounded-full overflow-hidden bg-gray-200 border-t-2 border-gray-400 shadow-lg mt-8">
-            <div id="progress-bar" 
-                 class="absolute inset-0 h-full transition-all duration-[3s] 
-                        <%= analysis.safetyRating.score >= 8 ? 'bg-green-500 glow-green' : 
-                            analysis.safetyRating.score >= 5 ? 'bg-yellow-500 glow-yellow' : 'bg-red-500 glow-red' %>"
-                 style="width: <%= analysis.safetyRating.score * 10 %>%">
+            <div class="analysis-grid">
+                <div class="analysis-card">
+                    <h3 class="card-title">
+                        <i class="fas fa-utensils"></i>
+                        Nutritional Information
+                    </h3>
+                    <div class="card-content">
+                        <div class="nutritional-info">
+                            <% if (detailedAnalysis.nutritionalInfo) { %>
+                                <div class="nutrition-item">
+                                    <i class="fas fa-fire"></i>
+                                    <div>
+                                        <h4>Calories</h4>
+                                        <p><%= detailedAnalysis.nutritionalInfo.calories %></p>
+                                    </div>
+                                </div>
+                                <div class="nutrition-item">
+                                    <i class="fas fa-drumstick-bite"></i>
+                                    <div>
+                                        <h4>Macronutrients</h4>
+                                        <ul>
+                                            <li>Protein: <%= detailedAnalysis.nutritionalInfo.macronutrients.protein %></li>
+                                            <li>Carbs: <%= detailedAnalysis.nutritionalInfo.macronutrients.carbs %></li>
+                                            <li>Fats: <%= detailedAnalysis.nutritionalInfo.macronutrients.fats %></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <% if (detailedAnalysis.nutritionalInfo.vitamins && detailedAnalysis.nutritionalInfo.vitamins.length > 0) { %>
+                                    <div class="nutrition-item">
+                                        <i class="fas fa-pills"></i>
+                                        <div>
+                                            <h4>Vitamins</h4>
+                                            <ul>
+                                                <% detailedAnalysis.nutritionalInfo.vitamins.forEach(vitamin => { %>
+                                                    <li><%= vitamin %></li>
+                                                <% }); %>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                <% } %>
+                                <% if (detailedAnalysis.nutritionalInfo.minerals && detailedAnalysis.nutritionalInfo.minerals.length > 0) { %>
+                                    <div class="nutrition-item">
+                                        <i class="fas fa-gem"></i>
+                                        <div>
+                                            <h4>Minerals</h4>
+                                            <ul>
+                                                <% detailedAnalysis.nutritionalInfo.minerals.forEach(mineral => { %>
+                                                    <li><%= mineral %></li>
+                                                <% }); %>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                <% } %>
+                            <% } else { %>
+                                <p class="no-info">Nutritional information not available</p>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="analysis-card">
+                    <h3 class="card-title">
+                        <i class="fas fa-heartbeat"></i>
+                        Health Impact
+                    </h3>
+                    <div class="card-content">
+                        <div class="health-impact">
+                            <% if (detailedAnalysis.healthImpact) { %>
+                                <div class="impact-item">
+                                    <i class="fas fa-clock"></i>
+                                    <div>
+                                        <h4>Short Term Effects</h4>
+                                        <p><%= detailedAnalysis.healthImpact.shortTerm %></p>
+                                    </div>
+                                </div>
+                                <div class="impact-item">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <div>
+                                        <h4>Long Term Effects</h4>
+                                        <p><%= detailedAnalysis.healthImpact.longTerm %></p>
+                                    </div>
+                                </div>
+                                <% if (detailedAnalysis.healthImpact.risks && detailedAnalysis.healthImpact.risks.length > 0) { %>
+                                    <div class="impact-item">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        <div>
+                                            <h4>Potential Risks</h4>
+                                            <ul>
+                                                <% detailedAnalysis.healthImpact.risks.forEach(risk => { %>
+                                                    <li><%= risk %></li>
+                                                <% }); %>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                <% } %>
+                            <% } else { %>
+                                <p class="no-info">Health impact information not available</p>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="analysis-card">
+                    <h3 class="card-title">
+                        <i class="fas fa-clipboard-list"></i>
+                        Dietary Considerations
+                    </h3>
+                    <div class="card-content">
+                        <% Object.entries(detailedAnalysis.dietaryConsiderations).forEach(([key, value]) => { %>
+                            <div class="diet-tag"><%= key %></div>
+                            <p><%= value %></p>
+                        <% }); %>
+                    </div>
+                </div>
+
+                <div class="analysis-card">
+                    <h3 class="card-title">
+                        <i class="fas fa-box-open"></i>
+                        Storage and Handling
+                    </h3>
+                    <div class="card-content">
+                        <div class="storage-info">
+                            <% if (detailedAnalysis.storage) { %>
+                                <div class="storage-item">
+                                    <i class="fas fa-info-circle"></i>
+                                    <div>
+                                        <h4>Storage Conditions</h4>
+                                        <p><%= detailedAnalysis.storage.conditions %></p>
+                                    </div>
+                                </div>
+                                <div class="storage-item">
+                                    <i class="fas fa-clock"></i>
+                                    <div>
+                                        <h4>Shelf Life</h4>
+                                        <p><%= detailedAnalysis.storage.shelfLife %></p>
+                                    </div>
+                                </div>
+                                <% if (detailedAnalysis.storage.precautions && detailedAnalysis.storage.precautions.length > 0) { %>
+                                    <div class="storage-item">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        <div>
+                                            <h4>Precautions</h4>
+                                            <ul>
+                                                <% detailedAnalysis.storage.precautions.forEach(precaution => { %>
+                                                    <li><%= precaution %></li>
+                                                <% }); %>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                <% } %>
+                            <% } else { %>
+                                <p class="no-info">Storage information not available</p>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="analysis-card">
+                    <h3 class="card-title">
+                        <i class="fas fa-leaf"></i>
+                        Environmental Impact
+                    </h3>
+                    <div class="card-content">
+                        <% Object.entries(detailedAnalysis.environmentalImpact).forEach(([key, value]) => { %>
+                            <div class="eco-badge"><%= key %></div>
+                            <p><%= value %></p>
+                        <% }); %>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="flex flex-wrap justify-between w-full max-w-[600px] mt-4">
-            <p class="text-green-500">Safety Assessment</p>
-            <p class="<%= analysis.safetyRating.score >= 8 ? 'text-green-500' : 
-                       analysis.safetyRating.score >= 5 ? 'text-yellow-500' : 'text-red-500' %>">
-                <%= analysis.safetyRating.score >= 8 ? 'Low Risk' : 
-                    analysis.safetyRating.score >= 5 ? 'Moderate Risk' : 'High Risk' %>
-            </p>
+        <div class="button-container">
+            <a href="/" class="button">
+                <i class="fas fa-home"></i>
+                Back to Home
+            </a>
+            <a href="/upload" class="button">
+                <i class="fas fa-camera"></i>
+                Scan Another Product
+            </a>
         </div>
-
-        <h2 class="text-2xl font-bold mt-10 w-full text-center">Quick Analysis</h2>
-        
-        <div class="w-full max-w-[600px] mt-6 space-y-6" id="quickAnalysisSection">
-            <div class="flex flex-wrap">
-                <h2 class="text-yellow-500 font-bold">Key Ingredients:</h2>
-                <p class="font-bold ml-2">
-                    <%= (analysis.keyIngredients && analysis.keyIngredients.length) ? 
-                        analysis.keyIngredients.join(', ') : 'Not detected' %>
-                </p>
-            </div>
-
-            <div class="flex flex-wrap">
-                <h2 class="text-yellow-500 font-bold">Safety Ratings:</h2>
-                <p class="font-bold ml-2">
-                    <%= analysis.safetyRating.score %>/10 - <%= analysis.safetyRating.explanation %>
-                </p>
-            </div>
-
-            <div class="flex flex-wrap">
-                <h2 class="text-yellow-500 font-bold">Contains:</h2>
-                <p class="font-bold ml-2 <%= (analysis.harmfulChemicals && analysis.harmfulChemicals.length > 0) ? 'text-yellow-500' : 'text-green-500' %>">
-                    <%= (analysis.harmfulChemicals && analysis.harmfulChemicals.length > 0) ? 
-                        analysis.harmfulChemicals.join(', ') : 'No harmful chemicals detected' %>
-                </p>
-            </div>
-        </div>
-        
-        <button class="mt-8 px-6 py-2 bg-[#8F00FF] text-white font-bold rounded-r-full rounded-l-full shadow-lg hover:bg-[#A020F0]"
-                onclick="window.location.href='/final?imagePath=<%= encodeURIComponent(imagePath) %>&analysis=<%= encodeURIComponent(JSON.stringify(analysis)) %>'">
-            View Detailed Analysis
-        </button>
     </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Progress bar animation
-            const progressBar = document.getElementById('progress-bar');
-            if (progressBar) {
-                void progressBar.offsetWidth;
-            }
-
-            // Text-to-speech functionality
-            const speakBtn = document.getElementById('speakBtn');
-            let isSpeaking = false;
-            let speechSynth = window.speechSynthesis;
-            
-            function getSpeechContent() {
-                // Start reading from Quick Analysis section
-                const quickAnalysisSection = document.getElementById('quickAnalysisSection');
-                if (!quickAnalysisSection) return '';
-                
-                let content = 'Quick Analysis. ';
-                const analysisItems = quickAnalysisSection.querySelectorAll('.flex.flex-wrap');
-                
-                analysisItems.forEach(item => {
-                    content += item.textContent.trim() + '. ';
-                });
-                
-                return content;
-            }
-
-            speakBtn.addEventListener('click', function() {
-                if (isSpeaking) {
-                    speechSynth.cancel();
-                    isSpeaking = false;
-                    speakBtn.classList.remove('speaking');
-                    speakBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>';
-                    return;
-                }
-                
-                const text = getSpeechContent();
-                if (!text) {
-                    console.error('No content found to read');
-                    return;
-                }
-                
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.rate = 0.9;
-                utterance.pitch = 1;
-                
-                // Try to find a suitable voice
-                const voices = speechSynth.getVoices();
-                if (voices.length > 0) {
-                    const preferredVoice = voices.find(v => v.lang.includes('en')) || voices[0];
-                    utterance.voice = preferredVoice;
-                }
-                
-                utterance.onend = utterance.onerror = function() {
-                    isSpeaking = false;
-                    speakBtn.classList.remove('speaking');
-                    speakBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>';
-                };
-                
-                try {
-                    speechSynth.speak(utterance);
-                    isSpeaking = true;
-                    speakBtn.classList.add('speaking');
-                    speakBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l14 9-14 9V3z"></path><path d="M19 12H5"></path></svg>';
-                } catch (error) {
-                    console.error('Speech synthesis error:', error);
-                    isSpeaking = false;
-                }
-            });
-            
-            // Load voices if needed
-            if (speechSynth.getVoices().length === 0) {
-                speechSynth.onvoiceschanged = function() {
-                    if (speechSynth.getVoices().length > 0) {
-                        speechSynth.onvoiceschanged = null;
-                    }
-                };
-            }
-        });
-    </script>
-
-    <!-- Chat bot -->
-    <script src='https://cdn.jotfor.ms/s/umd/latest/for-embedded-agent.js'></script>
-    <script>
-        window.addEventListener("DOMContentLoaded", function() {
-            window.AgentInitializer.init({
-                agentRenderURL: "https://agent.jotform.com/0195f80d7cda7c97ae5851e84e09e969a625",
-                rootId: "JotformAgent-0195f80d7cda7c97ae5851e84e09e969a625",
-                formID: "0195f80d7cda7c97ae5851e84e09e969a625",
-                queryParams: ["skipWelcome=1", "maximizable=1"],
-                domain: "https://www.jotform.com",
-                isDraggable: false,
-                background: "linear-gradient(180deg, #6C73A8 0%, #6C73A8 100%)",
-                buttonBackgroundColor: "#0066C3",
-                buttonIconColor: "#FFFFFF",
-                variant: false,
-                customizations: {
-                    "greeting": "Yes",
-                    "greetingMessage": "Hi buddy! how can I help you today?",
-                    "openByDefault": "No",
-                    "pulse": "Yes",
-                    "position": "left",
-                    "autoOpenChatIn": "0"
-                },
-                isVoice: undefined
-            });
-        });
-    </script>
 </body>
 </html>
