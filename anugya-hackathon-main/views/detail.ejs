@@ -67,21 +67,25 @@
         }
 
         .analysis-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            display: flex;
+            flex-direction: column;
             gap: 2rem;
             margin-bottom: 3rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .analysis-card {
             background: rgba(26, 32, 44, 0.8);
             border-radius: 1rem;
-            padding: 1.5rem;
+            padding: 2rem;
             box-shadow: 0 4px 20px rgba(159, 122, 234, 0.2);
             transition: all 0.3s ease;
             animation: fadeInUp 0.8s ease-out;
             border: 1px solid rgba(159, 122, 234, 0.2);
             backdrop-filter: blur(10px);
+            width: 100%;
         }
 
         .analysis-card:hover {
@@ -111,15 +115,101 @@
             margin: 0;
         }
 
+        .rating-container {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: rgba(159, 122, 234, 0.1);
+            border-radius: 0.8rem;
+            border: 1px solid rgba(159, 122, 234, 0.2);
+        }
+
+        .rating-circle {
+            width: 80px;
+            height: 80px;
+            min-width: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: var(--gradient-primary);
+            color: white;
+            animation: scaleIn 0.5s ease-out;
+            box-shadow: 0 0 30px rgba(159, 122, 234, 0.4);
+            border: 3px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .rating-bar-container {
+            flex-grow: 1;
+        }
+
+        .rating-bar {
+            width: 100%;
+            height: 12px;
+            background: rgba(159, 122, 234, 0.2);
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+
+        .rating-bar-fill {
+            height: 100%;
+            background: var(--gradient-primary);
+            border-radius: 6px;
+            transition: width 1s ease-out;
+            box-shadow: 0 0 10px rgba(159, 122, 234, 0.5);
+        }
+
+        .rating-labels {
+            display: flex;
+            justify-content: space-between;
+            color: #A0AEC0;
+            font-size: 0.9rem;
+        }
+
+        .rating-explanation {
+            color: var(--color-light);
+            font-size: 1rem;
+            margin-top: 0.5rem;
+            line-height: 1.4;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .info-item {
+            margin-bottom: 0;
+            padding: 1.2rem;
+            background: rgba(159, 122, 234, 0.1);
+            border-radius: 0.8rem;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(159, 122, 234, 0.2);
+            height: 100%;
+        }
+
         .safety-badge {
-            display: inline-block;
-            padding: 0.5rem 1.5rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.8rem 1.5rem;
             border-radius: 2rem;
             font-weight: 600;
             margin-bottom: 1rem;
             animation: pulse 2s infinite;
             text-transform: uppercase;
             letter-spacing: 1px;
+        }
+
+        .safety-badge i {
+            font-size: 1.2rem;
         }
 
         .safety-badge.safe {
@@ -132,69 +222,6 @@
             background: linear-gradient(135deg, #F56565, #C53030);
             color: white;
             box-shadow: 0 0 20px rgba(245, 101, 101, 0.3);
-        }
-
-        .rating-circle {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            font-weight: bold;
-            margin: 0 auto 1.5rem;
-            background: var(--gradient-primary);
-            color: white;
-            animation: scaleIn 0.5s ease-out;
-            box-shadow: 0 0 30px rgba(159, 122, 234, 0.4);
-            border: 3px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .info-item {
-            margin-bottom: 1.5rem;
-            padding: 1.2rem;
-            background: rgba(159, 122, 234, 0.1);
-            border-radius: 0.8rem;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(159, 122, 234, 0.2);
-        }
-
-        .info-item:hover {
-            background: rgba(159, 122, 234, 0.15);
-            transform: translateX(5px);
-        }
-
-        .info-item h4 {
-            color: var(--color-accent);
-            margin-bottom: 0.8rem;
-            font-size: 1.1rem;
-            text-shadow: 0 0 10px rgba(159, 122, 234, 0.3);
-        }
-
-        .info-item p, .info-item li {
-            color: #A0AEC0;
-            line-height: 1.6;
-        }
-
-        .info-item ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .info-item li {
-            margin-bottom: 0.8rem;
-            padding-left: 1.5rem;
-            position: relative;
-        }
-
-        .info-item li:before {
-            content: "•";
-            color: var(--color-accent);
-            position: absolute;
-            left: 0;
-            text-shadow: 0 0 10px rgba(159, 122, 234, 0.5);
         }
 
         .action-buttons {
@@ -298,27 +325,21 @@
         }
 
         @media (max-width: 768px) {
-            .analysis-grid {
-                grid-template-columns: 1fr;
+            .analysis-card {
+                padding: 1.5rem;
             }
 
-            .header-section h1 {
-                font-size: 2rem;
-            }
-
-            .action-buttons {
+            .rating-container {
                 flex-direction: column;
-            }
-
-            .action-button {
-                width: 100%;
-                justify-content: center;
+                text-align: center;
             }
 
             .rating-circle {
-                width: 80px;
-                height: 80px;
-                font-size: 1.5rem;
+                margin: 0 auto;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
             }
         }
 
@@ -354,23 +375,36 @@
                     <h3>Safety Assessment</h3>
                 </div>
                 <div class="safety-badge <%= analysis.safetyAssessment.isSafe ? 'safe' : 'unsafe' %>">
+                    <i class="fas <%= analysis.safetyAssessment.isSafe ? 'fa-check-circle' : 'fa-exclamation-circle' %>"></i>
                     <%= analysis.safetyAssessment.isSafe ? 'Safe to Consume' : 'Not Safe to Consume' %>
                 </div>
-                <div class="rating-circle">
-                    <%= analysis.safetyRating.score %>
-                </div>
-                <div class="info-item">
-                    <h4>Safety Rating Explanation</h4>
-                    <p><%= analysis.safetyRating.explanation %></p>
+                <div class="rating-container">
+                    <div class="rating-circle">
+                        <%= analysis.safetyRating.score %>
+                    </div>
+                    <div class="rating-bar-container">
+                        <div class="rating-bar">
+                            <div class="rating-bar-fill" style="width: <%= (analysis.safetyRating.score / 10) * 100 %>%"></div>
+                        </div>
+                        <div class="rating-labels">
+                            <span>Low Safety</span>
+                            <span>High Safety</span>
+                        </div>
+                        <div class="rating-explanation">
+                            <%= analysis.safetyRating.explanation %>
+                        </div>
+                    </div>
                 </div>
                 <% if (analysis.safetyAssessment.warnings && analysis.safetyAssessment.warnings.length > 0) { %>
-                    <div class="info-item">
-                        <h4>Warnings</h4>
-                        <ul>
-                            <% analysis.safetyAssessment.warnings.forEach(warning => { %>
-                                <li><%= warning %></li>
-                            <% }); %>
-                        </ul>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <h4><i class="fas fa-exclamation-triangle"></i> Warnings</h4>
+                            <ul>
+                                <% analysis.safetyAssessment.warnings.forEach(warning => { %>
+                                    <li><%= warning %></li>
+                                <% }); %>
+                            </ul>
+                        </div>
                     </div>
                 <% } %>
             </div>
@@ -381,24 +415,26 @@
                     <i class="fas fa-list"></i>
                     <h3>Key Ingredients</h3>
                 </div>
-                <div class="info-item">
-                    <h4>Main Ingredients</h4>
-                    <ul>
-                        <% analysis.keyIngredients.forEach(ingredient => { %>
-                            <li><%= ingredient %></li>
-                        <% }); %>
-                    </ul>
-                </div>
-                <% if (analysis.harmfulChemicals && analysis.harmfulChemicals.length > 0) { %>
+                <div class="info-grid">
                     <div class="info-item">
-                        <h4>Harmful Chemicals</h4>
+                        <h4><i class="fas fa-check-circle"></i> Main Ingredients</h4>
                         <ul>
-                            <% analysis.harmfulChemicals.forEach(chemical => { %>
-                                <li><%= chemical %></li>
+                            <% analysis.keyIngredients.forEach(ingredient => { %>
+                                <li><%= ingredient %></li>
                             <% }); %>
                         </ul>
                     </div>
-                <% } %>
+                    <% if (analysis.harmfulChemicals && analysis.harmfulChemicals.length > 0) { %>
+                        <div class="info-item">
+                            <h4><i class="fas fa-exclamation-circle"></i> Harmful Chemicals</h4>
+                            <ul>
+                                <% analysis.harmfulChemicals.forEach(chemical => { %>
+                                    <li><%= chemical %></li>
+                                <% }); %>
+                            </ul>
+                        </div>
+                    <% } %>
+                </div>
             </div>
 
             <!-- Health Benefits Card -->
@@ -407,19 +443,21 @@
                     <i class="fas fa-heart"></i>
                     <h3>Health Information</h3>
                 </div>
-                <% if (analysis.healthBenefits && analysis.healthBenefits.length > 0) { %>
+                <div class="info-grid">
+                    <% if (analysis.healthBenefits && analysis.healthBenefits.length > 0) { %>
+                        <div class="info-item">
+                            <h4><i class="fas fa-plus-circle"></i> Health Benefits</h4>
+                            <ul>
+                                <% analysis.healthBenefits.forEach(benefit => { %>
+                                    <li><%= benefit %></li>
+                                <% }); %>
+                            </ul>
+                        </div>
+                    <% } %>
                     <div class="info-item">
-                        <h4>Health Benefits</h4>
-                        <ul>
-                            <% analysis.healthBenefits.forEach(benefit => { %>
-                                <li><%= benefit %></li>
-                            <% }); %>
-                        </ul>
+                        <h4><i class="fas fa-info-circle"></i> Consumption Recommendations</h4>
+                        <p><%= analysis.consumptionRecommendations %></p>
                     </div>
-                <% } %>
-                <div class="info-item">
-                    <h4>Consumption Recommendations</h4>
-                    <p><%= analysis.consumptionRecommendations %></p>
                 </div>
             </div>
 
@@ -430,12 +468,15 @@
                         <i class="fas fa-exchange-alt"></i>
                         <h3>Alternative Products</h3>
                     </div>
-                    <div class="info-item">
-                        <ul>
-                            <% analysis.alternativeProducts.forEach(alternative => { %>
-                                <li><%= alternative %></li>
-                            <% }); %>
-                        </ul>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <h4><i class="fas fa-lightbulb"></i> Better Alternatives</h4>
+                            <ul>
+                                <% analysis.alternativeProducts.forEach(alternative => { %>
+                                    <li><%= alternative %></li>
+                                <% }); %>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             <% } %>
