@@ -23,34 +23,34 @@
         <img src="/assets/Untitled design (3).png" class="w-62 h-52 ml-[200px] mt-[40px] z-50 hover:rotate-[60deg] transition duration-300"/>
     </div>
         <div class="bg-white/10 backdrop-blur-lg w-96 h-64 flex items-center justify-center text-xl font-bold rounded-lg shadow-lg shadow-purple-500">
-            <form action="/detail" method="POST" enctype="multipart/form-data" id="upload-form">
-                <div id="file-upload-section">
-                    <div class="input1">
+            <form action="/detail" method="POST" enctype="multipart/form-data" id="upload-form" class="w-full">
+                <div id="file-upload-section" class="w-full">
+                    <div class="input1 flex flex-col items-center">
                         <input type="file" name="image" id="file-input" accept="image/*" required class="hidden">
-                        <label for="file-input" class="cursor-pointer">
+                        <label for="file-input" class="cursor-pointer bg-white/20 p-4 rounded-lg hover:bg-white/30 transition-colors">
                             <p class="text-center">Click to select an image</p>
                         </label>
                     </div>
-                    <button type="button" class="switch-btn" id="use-camera-btn">Use Camera Instead</button>
+                    <button type="button" class="switch-btn mt-4 px-4 py-2 bg-white/20 rounded-lg hover:bg-white/30 transition-colors" id="use-camera-btn">Use Camera Instead</button>
                 </div>
 
-                <div id="camera-section" style="display: none;">
+                <div id="camera-section" style="display: none;" class="w-full">
                     <div class="camera-container">
-                        <video id="camera-view" autoplay playsinline class="w-full"></video>
+                        <video id="camera-view" autoplay playsinline class="w-full rounded-lg"></video>
                         <canvas id="photo-canvas" style="display: none;"></canvas>
-                        <img id="photo-result" alt="Captured photo" class="w-full">
+                        <img id="photo-result" alt="Captured photo" class="w-full rounded-lg" style="display: none;">
                     </div>
-                    <div class="btn-group">
-                        <button type="button" id="capture-btn" class="mt-8 px-6 py-2 bg-white/10 backdrop-blur-lg text-white font-bold rounded-r-full rounded-l-full shadow-lg hover:bg-[#A020F0]">Take Photo</button>
-                        <button type="button" id="retake-btn" class="mt-8 px-6 py-2 bg-white/10 backdrop-blur-lg text-white font-bold rounded-r-full rounded-l-full shadow-lg hover:bg-[#A020F0]" style="display: none;">Retake</button>
-                        <button type="button" id="upload-btn" class="mt-8 px-6 py-2 bg-white/10 backdrop-blur-lg text-white font-bold rounded-r-full rounded-l-full shadow-lg hover:bg-[#A020F0]" style="display: none;">Use This Photo</button>
+                    <div class="btn-group flex flex-col items-center gap-2">
+                        <button type="button" id="capture-btn" class="mt-4 px-6 py-2 bg-white/20 text-white font-bold rounded-full hover:bg-white/30 transition-colors">Take Photo</button>
+                        <button type="button" id="retake-btn" class="mt-2 px-6 py-2 bg-white/20 text-white font-bold rounded-full hover:bg-white/30 transition-colors" style="display: none;">Retake</button>
+                        <button type="button" id="upload-btn" class="mt-2 px-6 py-2 bg-white/20 text-white font-bold rounded-full hover:bg-white/30 transition-colors" style="display: none;">Use This Photo</button>
                     </div>
-                    <button type="button" class="switch-btn" id="use-file-btn">Upload File Instead</button>
-                    <input type="hidden" name="camera-image" id="camera-image-data">
+                    <button type="button" class="switch-btn mt-4 px-4 py-2 bg-white/20 rounded-lg hover:bg-white/30 transition-colors" id="use-file-btn">Upload File Instead</button>
+                    <input type="hidden" name="cameraImage" id="camera-image-data">
                 </div>
 
-                <div class="button1">
-                    <button type="submit" id="submit-btn" class="mt-8 px-6 py-2 bg-white/10 backdrop-blur-lg text-white font-bold rounded-r-full rounded-l-full shadow-lg hover:bg-[#A020F0]" style="display: none;">Scan Ingredients</button>
+                <div class="button1 flex justify-center mt-4">
+                    <button type="submit" id="submit-btn" class="px-8 py-3 bg-[#A020F0] text-white font-bold rounded-full shadow-lg hover:bg-[#8A1FD0] transition-colors" style="display: none;">Scan Ingredients</button>
                 </div>
             </form>
         </div>
@@ -159,10 +159,19 @@
 
     // Handle form submission
     uploadForm.addEventListener('submit', function(e) {
+        e.preventDefault(); // Prevent default form submission
+        
         if (!fileInput.files[0] && !cameraImageData.value) {
-            e.preventDefault();
             alert("Please select an image or take a photo first.");
+            return;
         }
+
+        // Show loading state
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Scanning...';
+
+        // Submit the form
+        this.submit();
     });
 
     // Clean up camera when leaving page
