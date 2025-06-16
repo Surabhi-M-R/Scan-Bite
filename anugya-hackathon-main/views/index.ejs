@@ -3,208 +3,158 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Page 2</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
-    </style>
+    <title>ANUGYA - Upload Image</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
-<body class="bg-black text-white font-[Inter] overflow-x-hidden flex items-center justify-center min-h-screen relative flex-col">
-    <img src="/assets/IMAGE.png" alt="Top Left" class="absolute top-0 left-0 w-52 h-82 m-2"/>
-    <img src="/assets/IMAGE (1).png" alt="Top Right" class="absolute top-0 right-0 w-52 h-82 m-2"/>
-    <img src="/assets/Untitled design (1) 2 (1).png" alt="Bottom Left" class="absolute bottom-0 left-0 w-52 h-82 m-2"/>
-    <img src="/assets/Untitled design (1) 1.png" alt="Bottom Right" class="absolute bottom-0 right-0 w-52 h-82 m-2"/>
-    
-    <div class="flex">
-        <img src="/assets/Untitled design (3) (1).png" class="w-[600px] h-[600px] z-50 mt-[80px] top-0 left-0 w-52 h-82 m-2 hidden md:block"/>
-    <div class="flex flex-col items-center">
-        <div class="flex gap-[0px] ml-[190px]">
-        <img src="/assets/Screenshot (93).png" alt="title" class="w-[260px] h-[140px] mt-[100px] ml-[-10px]  justify-center z-50 "/>
-        <img src="/assets/Untitled design (3).png" class="w-62 h-52 ml-[200px] mt-[40px] z-50 hover:rotate-[60deg] transition duration-300"/>
-    </div>
-        <div class="bg-white/10 backdrop-blur-lg w-96 h-64 flex items-center justify-center text-xl font-bold rounded-lg shadow-lg shadow-purple-500">
-            <form action="/detail" method="POST" enctype="multipart/form-data" id="upload-form" class="w-full">
-                <div id="file-upload-section" class="w-full">
-                    <div class="input1 flex flex-col items-center">
-                        <input type="file" name="image" id="file-input" accept="image/*" required class="hidden">
-                        <label for="file-input" class="cursor-pointer bg-white/20 p-4 rounded-lg hover:bg-white/30 transition-colors">
-                            <p class="text-center">Click to select an image</p>
-                        </label>
-                    </div>
-                    <button type="button" class="switch-btn mt-4 px-4 py-2 bg-white/20 rounded-lg hover:bg-white/30 transition-colors" id="use-camera-btn">Use Camera Instead</button>
+<body>
+    <div class="container">
+        <h1>ANUGYA</h1>
+        <div class="scanner-box">
+            <form action="/detail" method="POST" enctype="multipart/form-data" class="scanner" id="uploadForm">
+                <div class="file-upload-container">
+                    <label class="file-upload-label">
+                        <i class="fas fa-cloud-upload-alt file-upload-icon"></i>
+                        <span class="file-upload-text">Choose a file or drag it here</span>
+                        <span class="file-upload-subtext">Supported formats: JPG, PNG, WEBP</span>
+                        <input type="file" name="image" accept="image/*" required id="fileInput">
+                    </label>
                 </div>
 
-                <div id="camera-section" style="display: none;" class="w-full">
-                    <div class="camera-container">
-                        <video id="camera-view" autoplay playsinline class="w-full rounded-lg"></video>
-                        <canvas id="photo-canvas" style="display: none;"></canvas>
-                        <img id="photo-result" alt="Captured photo" class="w-full rounded-lg" style="display: none;">
-                    </div>
-                    <div class="btn-group flex flex-col items-center gap-2">
-                        <button type="button" id="capture-btn" class="mt-4 px-6 py-2 bg-white/20 text-white font-bold rounded-full hover:bg-white/30 transition-colors">Take Photo</button>
-                        <button type="button" id="retake-btn" class="mt-2 px-6 py-2 bg-white/20 text-white font-bold rounded-full hover:bg-white/30 transition-colors" style="display: none;">Retake</button>
-                        <button type="button" id="upload-btn" class="mt-2 px-6 py-2 bg-white/20 text-white font-bold rounded-full hover:bg-white/30 transition-colors" style="display: none;">Use This Photo</button>
-                    </div>
-                    <button type="button" class="switch-btn mt-4 px-4 py-2 bg-white/20 rounded-lg hover:bg-white/30 transition-colors" id="use-file-btn">Upload File Instead</button>
-                    <input type="hidden" name="cameraImage" id="camera-image-data">
+                <div class="camera-container">
+                    <button type="button" class="camera-btn" id="startCamera">
+                        <i class="fas fa-camera camera-icon"></i>
+                        <span>Take Photo</span>
+                    </button>
                 </div>
 
-                <div class="button1 flex justify-center mt-4">
-                    <button type="submit" id="submit-btn" class="px-8 py-3 bg-[#A020F0] text-white font-bold rounded-full shadow-lg hover:bg-[#8A1FD0] transition-colors" style="display: none;">Scan Ingredients</button>
+                <div class="camera-preview" id="cameraPreview">
+                    <video id="video" autoplay playsinline></video>
+                    <img id="capturedImage" style="display: none;">
+                    <div class="camera-controls">
+                        <button type="button" class="capture-btn" id="captureBtn">
+                            <i class="fas fa-camera"></i> Capture
+                        </button>
+                        <button type="button" class="cancel-btn" id="cancelBtn">
+                            <i class="fas fa-times"></i> Cancel
+                        </button>
+                    </div>
                 </div>
+
+                <button type="submit" id="submitBtn">Scan Product</button>
             </form>
         </div>
-        
-        <img src="/assets/Untitled design (1).png" class="w-[180px] h-[220px] ml-[-400px] mt-[10px] z-50 hover:rotate-[-60deg] transition duration-300"/>
     </div>
-    <img src="/assets/Untitled design (3) (1).png" class="w-[600px] h-[600px] z-50 mt-[80px] top-0 left-0 w-52 h-82 m-2 hidden md:block" />
-</div>
 
-<script>
-    // DOM Elements
-    const fileUploadSection = document.getElementById('file-upload-section');
-    const cameraSection = document.getElementById('camera-section');
-    const useCameraBtn = document.getElementById('use-camera-btn');
-    const useFileBtn = document.getElementById('use-file-btn');
-    const cameraView = document.getElementById('camera-view');
-    const photoCanvas = document.getElementById('photo-canvas');
-    const photoResult = document.getElementById('photo-result');
-    const captureBtn = document.getElementById('capture-btn');
-    const retakeBtn = document.getElementById('retake-btn');
-    const uploadBtn = document.getElementById('upload-btn');
-    const submitBtn = document.getElementById('submit-btn');
-    const fileInput = document.getElementById('file-input');
-    const cameraImageData = document.getElementById('camera-image-data');
-    const uploadForm = document.getElementById('upload-form');
+    <script>
+        const startCameraBtn = document.getElementById('startCamera');
+        const cameraPreview = document.getElementById('cameraPreview');
+        const video = document.getElementById('video');
+        const capturedImage = document.getElementById('capturedImage');
+        const captureBtn = document.getElementById('captureBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const submitBtn = document.getElementById('submitBtn');
+        const fileInput = document.getElementById('fileInput');
+        const uploadForm = document.getElementById('uploadForm');
+        let stream = null;
 
-    // Camera variables
-    let stream = null;
+        // Handle file input change
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    capturedImage.src = e.target.result;
+                    cameraPreview.classList.add('active');
+                    video.style.display = 'none';
+                    capturedImage.style.display = 'block';
+                    captureBtn.style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
 
-    // Switch between file upload and camera
-    useCameraBtn.addEventListener('click', () => {
-        fileUploadSection.style.display = 'none';
-        cameraSection.style.display = 'block';
-        startCamera();
-    });
+        // Start camera
+        startCameraBtn.addEventListener('click', async () => {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        facingMode: 'environment',
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    } 
+                });
+                video.srcObject = stream;
+                cameraPreview.classList.add('active');
+                startCameraBtn.style.display = 'none';
+                capturedImage.style.display = 'none';
+                video.style.display = 'block';
+                captureBtn.style.display = 'block';
+            } catch (err) {
+                console.error('Error accessing camera:', err);
+                alert('Could not access camera. Please make sure you have granted camera permissions.');
+            }
+        });
 
-    useFileBtn.addEventListener('click', () => {
-        cameraSection.style.display = 'none';
-        fileUploadSection.style.display = 'block';
-        stopCamera();
-    });
+        // Capture photo
+        captureBtn.addEventListener('click', () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            
+            // Convert canvas to blob
+            canvas.toBlob((blob) => {
+                const file = new File([blob], 'camera_capture.jpg', { type: 'image/jpeg' });
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+                fileInput.files = dataTransfer.files;
+                
+                // Display captured image
+                capturedImage.src = canvas.toDataURL('image/jpeg');
+                video.style.display = 'none';
+                capturedImage.style.display = 'block';
+                captureBtn.style.display = 'none';
+            }, 'image/jpeg');
+        });
 
-    // Camera functions
-    async function startCamera() {
-        try {
-            stream = await navigator.mediaDevices.getUserMedia({ 
-                video: { facingMode: 'environment' }, 
-                audio: false 
-            });
-            cameraView.srcObject = stream;
-            cameraView.style.display = 'block';
-            captureBtn.style.display = 'inline-block';
-        } catch (err) {
-            console.error("Camera error: ", err);
-            alert("Could not access the camera. Please check permissions.");
-            useFileBtn.click();
-        }
-    }
+        // Cancel camera
+        cancelBtn.addEventListener('click', () => {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+            cameraPreview.classList.remove('active');
+            startCameraBtn.style.display = 'flex';
+            video.style.display = 'block';
+            capturedImage.style.display = 'none';
+            captureBtn.style.display = 'block';
+            fileInput.value = '';
+        });
 
-    function stopCamera() {
-        if (stream) {
-            stream.getTracks().forEach(track => track.stop());
-            cameraView.style.display = 'none';
-            cameraView.srcObject = null;
-            stream = null;
-        }
-    }
+        // Handle form submission
+        uploadForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (!fileInput.files[0]) {
+                alert('Please select an image or take a photo first.');
+                return;
+            }
 
-    // Capture photo
-    captureBtn.addEventListener('click', () => {
-        photoCanvas.width = cameraView.videoWidth;
-        photoCanvas.height = cameraView.videoHeight;
-        photoCanvas.getContext('2d').drawImage(cameraView, 0, 0);
-        
-        photoResult.src = photoCanvas.toDataURL('image/jpeg');
-        photoResult.style.display = 'block';
-        cameraView.style.display = 'none';
-        
-        captureBtn.style.display = 'none';
-        retakeBtn.style.display = 'inline-block';
-        uploadBtn.style.display = 'inline-block';
-    });
+            // Show loading state
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Scanning...';
 
-    // Retake photo
-    retakeBtn.addEventListener('click', () => {
-        photoResult.style.display = 'none';
-        cameraView.style.display = 'block';
-        
-        retakeBtn.style.display = 'none';
-        uploadBtn.style.display = 'none';
-        captureBtn.style.display = 'inline-block';
-    });
+            // Submit the form
+            this.submit();
+        });
 
-    // Use captured photo
-    uploadBtn.addEventListener('click', () => {
-        cameraImageData.value = photoCanvas.toDataURL('image/jpeg');
-        submitBtn.style.display = 'inline-block';
-    });
-
-    // Handle file selection
-    fileInput.addEventListener('change', () => {
-        if (fileInput.files.length > 0) {
-            submitBtn.style.display = 'inline-block';
-        }
-    });
-
-    // Handle form submission
-    uploadForm.addEventListener('submit', function(e) {
-        e.preventDefault(); // Prevent default form submission
-        
-        if (!fileInput.files[0] && !cameraImageData.value) {
-            alert("Please select an image or take a photo first.");
-            return;
-        }
-
-        // Show loading state
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Scanning...';
-
-        // Submit the form
-        this.submit();
-    });
-
-    // Clean up camera when leaving page
-    window.addEventListener('beforeunload', () => {
-        stopCamera();
-    });
-</script>
+        // Clean up camera when leaving page
+        window.addEventListener('beforeunload', () => {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+        });
+    </script>
 </body>
-
-<script src='https://cdn.jotfor.ms/s/umd/latest/for-embedded-agent.js'></script>
-<script>
-  window.addEventListener("DOMContentLoaded", function() {
-    window.AgentInitializer.init({
-      agentRenderURL: "https://agent.jotform.com/0195f80d7cda7c97ae5851e84e09e969a625",
-      rootId: "JotformAgent-0195f80d7cda7c97ae5851e84e09e969a625",
-      formID: "0195f80d7cda7c97ae5851e84e09e969a625",
-      queryParams: ["skipWelcome=1", "maximizable=1"],
-      domain: "https://www.jotform.com",
-      isDraggable: false,
-      background: "linear-gradient(180deg, #6C73A8 0%, #6C73A8 100%)",
-      buttonBackgroundColor: "#0066C3",
-      buttonIconColor: "#FFFFFF",
-      variant: false,
-      customizations: {
-        "greeting": "Yes",
-        "greetingMessage": "Hi buddy! how can i help you today?",
-        "openByDefault": "No",
-        "pulse": "Yes",
-        "position": "left",
-        "autoOpenChatIn": "0"
-      },
-      isVoice: undefined
-    });
-  });
-</script>
 </html>
